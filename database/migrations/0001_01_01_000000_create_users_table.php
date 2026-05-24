@@ -18,7 +18,19 @@ return new class extends Migration
             $table->timestamp('email_verified_at')->nullable();
             $table->string('password');
             $table->rememberToken();
+
+            // Campos do domínio (Usuário)
+            $table->string('cpf', 14)->unique();
+            $table->date('data_nascimento');
+            $table->string('rua');
+            $table->integer('numero_rua');
+            $table->string('cep', 9);
+            $table->string('numero_telefone', 20);
+            $table->string('status')->default('ativo');
+            $table->string('tipo')->default('aluno');
+
             $table->timestamps();
+            $table->softDeletes();
         });
 
         Schema::create('password_reset_tokens', function (Blueprint $table) {
