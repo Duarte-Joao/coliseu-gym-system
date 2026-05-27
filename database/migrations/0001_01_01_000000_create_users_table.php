@@ -19,13 +19,13 @@ return new class extends Migration
             $table->string('password');
             $table->rememberToken();
 
-            // Campos do domínio (Usuário)
-            $table->string('cpf', 14)->unique();
-            $table->date('data_nascimento');
-            $table->string('rua');
-            $table->integer('numero_rua');
-            $table->string('cep', 9);
-            $table->string('numero_telefone', 20);
+            // Campos do domínio (Usuário) - Nullable para suportar onboarding simplificado nativo
+            $table->string('cpf', 14)->unique()->nullable();
+            $table->date('data_nascimento')->nullable();
+            $table->string('rua')->nullable();
+            $table->integer('numero_rua')->nullable();
+            $table->string('cep', 9)->nullable();
+            $table->string('numero_telefone', 20)->nullable();
             $table->string('status')->default('ativo');
             $table->string('tipo')->default('aluno');
 

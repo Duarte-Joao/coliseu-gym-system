@@ -33,7 +33,57 @@ class UserFactory extends Factory
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
+            
+            // Novos campos do domínio de academia
+            'cpf' => fake()->numerify('###.###.###-##'), // CPF formatado de maneira segura
+            'data_nascimento' => fake()->date('Y-m-d', '-14 years'), // Idade >= 14 anos
+            'rua' => fake()->streetName(),
+            'numero_rua' => fake()->numberBetween(1, 2500),
+            'cep' => fake()->numerify('#####-###'), // CEP formatado 9 caracteres
+            'numero_telefone' => fake()->numerify('(##) 9####-####'), // Celular brasileiro
+            'status' => 'ativo',
+            'tipo' => 'aluno',
         ];
+    }
+
+    /**
+     * Definir o usuário como aluno.
+     */
+    public function aluno(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tipo' => 'aluno',
+        ]);
+    }
+
+    /**
+     * Definir o usuário como instrutor.
+     */
+    public function instrutor(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tipo' => 'instrutor',
+        ]);
+    }
+
+    /**
+     * Definir o usuário como administrador.
+     */
+    public function admin(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'tipo' => 'admin',
+        ]);
+    }
+
+    /**
+     * Definir o usuário como inativo.
+     */
+    public function inativo(): static
+    {
+        return $this->state(fn (array $attributes) => [
+            'status' => 'inativo',
+        ]);
     }
 
     /**
