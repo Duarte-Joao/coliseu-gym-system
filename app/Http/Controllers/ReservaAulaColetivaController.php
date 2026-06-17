@@ -45,7 +45,6 @@ class ReservaAulaColetivaController extends Controller
             'aula_coletiva_id' => [
                 'required',
                 'exists:aulas_coletivas,id',
-                // Evita reserva duplicada do mesmo aluno na mesma aula
                 Rule::unique('reserva_aula_coletivas')->where(function ($query) use ($request) {
                     return $query->where('usuario_id', $request->input('usuario_id'));
                 }),
@@ -54,10 +53,8 @@ class ReservaAulaColetivaController extends Controller
             'status' => ['nullable', Rule::in(['confirmada', 'cancelada', 'presenca_confirmada'])],
         ]);
 
-        // Regra de Negócio: Verificar se a aula coletiva ainda possui vagas disponíveis
         $aula = AulaColetiva::withCount('reservas')->findOrFail($validated['aula_coletiva_id']);
         
-        // Apenas contar reservas que não estão canceladas
         $reservasAtivasCount = ReservaAulaColetiva::where('aula_coletiva_id', $aula->id)
             ->where('status', '!=', 'cancelada')
             ->count();
@@ -68,7 +65,6 @@ class ReservaAulaColetivaController extends Controller
             ], Response::HTTP_UNPROCESSABLE_ENTITY);
         }
 
-        // Regra de Negócio: Impedir reservas em aulas que já foram realizadas ou canceladas
         if ($aula->status !== 'agendada') {
             return response()->json([
                 'message' => "Não é possível reservar vagas para uma aula com status '{$aula->status}'.",
@@ -80,17 +76,11 @@ class ReservaAulaColetivaController extends Controller
         return response()->json($reserva->load(['aula', 'aluno']), Response::HTTP_CREATED);
     }
 
-    /**
-     * Exibe os detalhes de uma reserva específica.
-     */
     public function show(ReservaAulaColetiva $reservaAulaColetiva): JsonResponse
     {
         return response()->json($reservaAulaColetiva->load(['aula', 'aluno']));
     }
 
-    /**
-     * Atualiza o status da reserva (ex: marcar presença ou cancelar a reserva do aluno).
-     */
     public function update(Request $request, ReservaAulaColetiva $reservaAulaColetiva): JsonResponse
     {
         $validated = $request->validate([

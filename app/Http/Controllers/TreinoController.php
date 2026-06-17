@@ -13,7 +13,7 @@ class TreinoController extends Controller
 {
     /**
      * Exibe a listagem de templates de treino.
-     */
+     */ 
     public function index(Request $request): JsonResponse
     {
         $instrutorId = $request->query('instrutor_id');
@@ -34,10 +34,7 @@ class TreinoController extends Controller
         return response()->json($treinos);
     }
 
-    /**
-     * Cria um novo template de treino.
-     */
-    public function store(Request $request): JsonResponse
+        public function store(Request $request): JsonResponse
     {
         $validated = $request->validate([
             'instrutor_id' => 'required|exists:instrutores,id',
