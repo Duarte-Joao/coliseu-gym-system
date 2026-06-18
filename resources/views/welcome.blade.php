@@ -13,7 +13,7 @@
     <header class="navbar">
         <div class="logo">
             Coliseu <span>Gym</span>
-            <small>Desde 2015 · Chapecó - SC</small>
+            <small>Desde 2026 · Chapecó - SC</small>
         </div>
         <nav>
             <a href="{{ route('home') }}">Início</a>
