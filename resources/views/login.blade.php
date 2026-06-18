@@ -272,12 +272,20 @@
       border: none;
       color: var(--muted);
       cursor: pointer;
-      font-size: 1rem;
+      /* ALTERAÇÃO 1: removido font-size: 1rem — SVG tem seu próprio tamanho via width/height */
       padding: 0;
       line-height: 1;
+      /* ALTERAÇÃO 2: adicionado display:flex e align-items para centralizar o SVG no botão */
+      display: flex;
+      align-items: center;
+      justify-content: center;
       transition: color 0.2s;
     }
     .pwd-toggle:hover { color: var(--txt); }
+    /* ALTERAÇÃO 3: garante que o SVG herde a cor do botão via currentColor */
+    .pwd-toggle svg {
+      display: block;
+    }
 
     /* Grade COM  2 colunas */
     .form-row {
@@ -438,7 +446,7 @@
   <header class="navbar">
     <div class="logo">
       Coliseu <span>Gym</span>
-      <small>Desde 2015 · Chapecó — SC</small>
+      <small>Desde 2026 · Chapecó — SC</small>
     </div>
     <nav>
       <a href="{{ route('home') }}">Início</a>
@@ -458,8 +466,8 @@
 
       <!-- Abas de perfil -->
       <div class="profile-tabs">
-        <button type="button" class="tab-btn active" onclick="mudarPerfil('aluno')">🛡️ Sou Aluno</button>
-        <button type="button" class="tab-btn" onclick="mudarPerfil('instrutor')">⚔️ Sou Instrutor</button>
+        <button type="button" class="tab-btn active" onclick="mudarPerfil('aluno')"> Sou Aluno</button>
+        <button type="button" class="tab-btn" onclick="mudarPerfil('instrutor')"> Sou Instrutor</button>
       </div>
 
       <!-- Sub-abas (visíveis apenas para aluno) -->
@@ -494,7 +502,12 @@
               <input type="password" name="password" id="password"
                      placeholder="••••••••" class="form-input"
                      autocomplete="new-password" required>
-              <button type="button" class="pwd-toggle" onclick="togglePwd('password', this)">👁️</button>
+              {{-- ALTERAÇÃO 4: emoji 👁️ substituído pelo SVG VisibilityIcon do MUI --}}
+              <button type="button" class="pwd-toggle" onclick="togglePwd('password', this)">
+                <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="currentColor">
+                  <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                </svg>
+              </button>
             </div>
           </div>
 
@@ -522,7 +535,7 @@
           <div class="fg">
             <label for="input-name">Nome completo <span class="req">*</span></label>
             <input type="text" name="name" id="input-name"
-                   placeholder="Ex: Maximus Decimus" class="form-input">
+                   placeholder="Ex: Jackson Five" class="form-input">
           </div>
 
           <div class="fg">
@@ -537,7 +550,12 @@
               <div class="pwd-wrap">
                 <input type="password" name="password_cadastro" id="password_cadastro"
                        placeholder="••••••••" class="form-input">
-                <button type="button" class="pwd-toggle" onclick="togglePwd('password_cadastro', this)">👁️</button>
+                {{-- ALTERAÇÃO 5: emoji 👁️ substituído pelo SVG VisibilityIcon do MUI --}}
+                <button type="button" class="pwd-toggle" onclick="togglePwd('password_cadastro', this)">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                </button>
               </div>
             </div>
             <div class="fg">
@@ -545,7 +563,12 @@
               <div class="pwd-wrap">
                 <input type="password" name="password_confirmation" id="password_confirmation"
                        placeholder="••••••••" class="form-input">
-                <button type="button" class="pwd-toggle" onclick="togglePwd('password_confirmation', this)">👁️</button>
+                {{-- ALTERAÇÃO 6: emoji 👁️ substituído pelo SVG VisibilityIcon do MUI --}}
+                <button type="button" class="pwd-toggle" onclick="togglePwd('password_confirmation', this)">
+                  <svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="currentColor">
+                    <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+                  </svg>
+                </button>
               </div>
             </div>
           </div>
@@ -608,7 +631,7 @@
               ← Voltar
             </button>
             <button type="submit" class="btn btn-primary" style="width:auto; flex:1;">
-              Concluir Matrícula
+              Concluir Cadastro
             </button>
           </div>
 
@@ -629,12 +652,26 @@
   </footer>
 
   <script>
-    // mostra ou some com a senha 
+    // ALTERAÇÃO 7: SVGs definidos como constantes no topo do script,
+    // em vez de strings de emoji hardcoded dentro da função.
+    // ICON_SHOW = VisibilityIcon (olho aberto) — exibido quando a senha está oculta
+    // ICON_HIDE = VisibilityOffIcon (olho com risco) — exibido quando a senha está visível
+    const ICON_SHOW = `<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 4.5C7 4.5 2.73 7.61 1 12c1.73 4.39 6 7.5 11 7.5s9.27-3.11 11-7.5c-1.73-4.39-6-7.5-11-7.5zM12 17c-2.76 0-5-2.24-5-5s2.24-5 5-5 5 2.24 5 5-2.24 5-5 5zm0-8c-1.66 0-3 1.34-3 3s1.34 3 3 3 3-1.34 3-3-1.34-3-3-3z"/>
+    </svg>`;
+
+    const ICON_HIDE = `<svg xmlns="http://www.w3.org/2000/svg" height="20" width="20" viewBox="0 0 24 24" fill="currentColor">
+      <path d="M12 7c2.76 0 5 2.24 5 5 0 .65-.13 1.26-.36 1.83l2.92 2.92c1.51-1.26 2.7-2.89 3.43-4.75-1.73-4.39-6-7.5-11-7.5-1.4 0-2.74.25-3.98.7l2.16 2.16C10.74 7.13 11.35 7 12 7zM2 4.27l2.28 2.28.46.46C3.08 8.3 1.78 10.02 1 12c1.73 4.39 6 7.5 11 7.5 1.55 0 3.03-.3 4.38-.84l.42.42L19.73 22 21 20.73 3.27 3 2 4.27zM7.53 9.8l1.55 1.55c-.05.21-.08.43-.08.65 0 1.66 1.34 3 3 3 .22 0 .44-.03.65-.08l1.55 1.55c-.67.33-1.41.53-2.2.53-2.76 0-5-2.24-5-5 0-.79.2-1.53.53-2.2zm4.31-.78l3.15 3.15.02-.16c0-1.66-1.34-3-3-3l-.17.01z"/>
+    </svg>`;
+
+    // ALTERAÇÃO 8: btn.textContent virou btn.innerHTML, e os emojis viraram as constantes SVG acima.
+    // textContent só aceita texto puro — não renderiza HTML/SVG.
+    // innerHTML aceita e renderiza a tag <svg> corretamente.
     function togglePwd(inputId, btn) {
       const input = document.getElementById(inputId);
       const isHidden = input.type === 'password';
       input.type = isHidden ? 'text' : 'password';
-      btn.textContent = isHidden ? '🙈' : '👁️';
+      btn.innerHTML = isHidden ? ICON_HIDE : ICON_SHOW;
     }
 
     // Limpa/some todos os inputs do formulário
