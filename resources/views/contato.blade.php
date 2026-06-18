@@ -277,6 +277,11 @@
       line-height: 1.6;
     }
 
+    .form-input option {
+      color: var(--txt);
+      background-color: #1f1f27ff;
+    }
+
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;

@@ -1,33 +1,29 @@
 <?php
 
 use App\Actions\Fortify\CreateNewUser;
-use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\AulaColetivaController;
+use App\Http\Controllers\InstrutorController;
+use App\Http\Controllers\PagamentoPlanoAlunoController;
+use App\Http\Controllers\PlanoAlunoController;
+use App\Http\Controllers\ReservaAulaColetivaController;
+use App\Http\Controllers\TreinoAlunoController;
+use App\Http\Controllers\TreinoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
 
 // ROTAS PÚBLICAS
 Route::view('/', 'welcome')->name('home');
 Route::view('/planos', 'planos')->name('planos');
+Route::any('/contato', fn () => view('contato'))->name('contato');
 
-Route::any('/contato', function () {
-    return view('contato');
-})->name('contato');
+Route::get('/login', fn () => view('login'))->name('login');
 
-Route::get('/login', function () {
-    return view('login');
-})->name('login');
-
-
-// 🔀 REDIRECIONAMENTO INTELIGENTE (Separa Aluno e Instrutor pelos dados digitados)
-Route::post('/login', function (Request $request) { 
-    // Junta todos os valores preenchidos no formulário para varredura
-    $dadosFormulario = implode(' ', $request->all());
-
-    // Se o usuário digitou a palavra 'instrutor' no e-mail ou login, vai para o Instrutor
-    if (str_contains(strtolower($dadosFormulario), 'instrutor')) {
+Route::post('/login', function (Request $request) {
+    $dados = implode(' ', $request->all());
+    if (str_contains(strtolower($dados), 'instrutor')) {
         return redirect()->route('dashboard.instrutor');
     }
-
-    // Caso contrário, vai para o painel do aluno padrão
     return redirect()->route('dashboard.aluno');
 })->name('login.post');
 
@@ -36,20 +32,26 @@ Route::post('/cadastro', function (Request $request) {
     return redirect()->route('dashboard.aluno');
 })->name('register.post');
 
+// DASHBOARDS
+Route::get('/dashboard-aluno', fn () => view('aluno.dashboard'))->name('dashboard.aluno');
+Route::get('/dashboard-instrutor', fn () => view('instrutor.dashboard'))->name('dashboard.instrutor');
 
-// 🏠 PAINEL DO ALUNO (Visualização Livre para Testes)
-Route::get('/dashboard-aluno', function () {
-    return view('aluno.dashboard');
-})->name('dashboard.aluno');
+// CRUD RESOURCES
+Route::resource('treinos', TreinoController::class);
+Route::resource('instrutores', InstrutorController::class);
+Route::resource('usuarios', UserController::class);
+Route::resource('plano-alunos', PlanoAlunoController::class)
+    ->parameters(['plano-alunos' => 'plano']);
+Route::resource('pagamento-plano-alunos', PagamentoPlanoAlunoController::class)
+    ->parameters(['pagamento-plano-alunos' => 'pagamento']);
+Route::resource('aulas-coletivas', AulaColetivaController::class)
+    ->parameters(['aulas-coletivas' => 'aula']);
+Route::resource('reserva-aulas-coletivas', ReservaAulaColetivaController::class)
+    ->parameters(['reserva-aulas-coletivas' => 'reserva']);
+Route::resource('treino-alunos', TreinoAlunoController::class)
+    ->parameters(['treino-alunos' => 'treinoAluno']);
 
-
-// 🏋️‍♂️ PAINEL DO INSTRUTOR (Visualização Livre para Testes)
-Route::get('/dashboard-instrutor', function () {
-    return view('instrutor.dashboard');
-})->name('dashboard.instrutor');
-
-
-// ROTAS PROTEGIDAS (Middleware do Laravel)
+// ROTA PROTEGIDA (Fortify)
 Route::middleware(['auth', 'verified'])->group(function () {
     Route::view('dashboard', 'dashboard')->name('dashboard');
 });

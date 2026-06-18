@@ -6,99 +6,96 @@ namespace App\Http\Controllers;
 
 use App\Models\AulaColetiva;
 use App\Models\ReservaAulaColetiva;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class ReservaAulaColetivaController extends Controller
 {
-    /**
-     * Exibe a lista de reservas do sistema.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $aulaColetivaId = $request->query('aula_coletiva_id');
-        $usuarioId = $request->query('usuario_id');
-
         $query = ReservaAulaColetiva::query()->with(['aula', 'aluno']);
 
-        if ($aulaColetivaId) {
-            $query->where('aula_coletiva_id', $aulaColetivaId);
+        if ($request->filled('aula_coletiva_id')) {
+            $query->where('aula_coletiva_id', $request->aula_coletiva_id);
+        }
+        if ($request->filled('usuario_id')) {
+            $query->where('usuario_id', $request->usuario_id);
         }
 
-        if ($usuarioId) {
-            $query->where('usuario_id', $usuarioId);
-        }
+        $reservas = $query->paginate(15)->withQueryString();
 
-        $reservas = $query->paginate(15);
-
-        return response()->json($reservas);
+        return view('reserva-aulas-coletivas.index', compact('reservas'));
     }
 
-    /**
-     * Efetua a reserva de uma vaga para o aluno em uma aula coletiva.
-     */
-    public function store(Request $request): JsonResponse
+    public function create(Request $request): View
+    {
+        $aulas   = AulaColetiva::where('status', 'agendada')->with('instrutor.usuario')->get();
+        $usuarios = User::where('tipo', 'aluno')->orWhereNull('tipo')->get();
+        $aulaSelecionada = $request->filled('aula_coletiva_id')
+            ? AulaColetiva::find($request->aula_coletiva_id)
+            : null;
+
+        return view('reserva-aulas-coletivas.create', compact('aulas', 'usuarios', 'aulaSelecionada'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'aula_coletiva_id' => [
                 'required',
                 'exists:aulas_coletivas,id',
-                Rule::unique('reserva_aula_coletivas')->where(function ($query) use ($request) {
-                    return $query->where('usuario_id', $request->input('usuario_id'));
-                }),
+                Rule::unique('reserva_aula_coletivas')->where(fn ($q) => $q->where('usuario_id', $request->usuario_id)),
             ],
             'usuario_id' => 'required|exists:users,id',
-            'status' => ['nullable', Rule::in(['confirmada', 'cancelada', 'presenca_confirmada'])],
+            'status'     => ['nullable', Rule::in(['confirmada', 'cancelada', 'presenca_confirmada'])],
         ]);
 
         $aula = AulaColetiva::findOrFail($validated['aula_coletiva_id']);
-        
-        $reservasAtivasCount = ReservaAulaColetiva::where('aula_coletiva_id', $aula->id)
+
+        $ocupadas = ReservaAulaColetiva::where('aula_coletiva_id', $aula->id)
             ->where('status', '!=', 'cancelada')
             ->count();
 
-        if ($reservasAtivasCount >= $aula->vagas) {
-            return response()->json([
-                'message' => 'Não há vagas disponíveis para esta aula coletiva.',
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+        if ($ocupadas >= $aula->vagas) {
+            return back()->withErrors(['aula_coletiva_id' => 'Não há vagas disponíveis para esta aula.'])->withInput();
         }
 
         if ($aula->status !== 'agendada') {
-            return response()->json([
-                'message' => "Não é possível reservar vagas para uma aula com status '{$aula->status}'.",
-            ], Response::HTTP_UNPROCESSABLE_ENTITY);
+            return back()->withErrors(['aula_coletiva_id' => "Não é possível reservar uma aula com status '{$aula->status}'."]) ->withInput();
         }
 
-        $reserva = ReservaAulaColetiva::create($validated);
+        ReservaAulaColetiva::create($validated);
 
-        return response()->json($reserva->load(['aula', 'aluno']), Response::HTTP_CREATED);
+        return redirect()->route('reserva-aulas-coletivas.index')->with('success', 'Reserva realizada com sucesso!');
     }
 
-    public function show(ReservaAulaColetiva $reservaAulaColetiva): JsonResponse
+    public function show(ReservaAulaColetiva $reserva): View
     {
-        return response()->json($reservaAulaColetiva->load(['aula', 'aluno']));
+        return view('reserva-aulas-coletivas.show', ['reserva' => $reserva->load(['aula', 'aluno'])]);
     }
 
-    public function update(Request $request, ReservaAulaColetiva $reservaAulaColetiva): JsonResponse
+    public function edit(ReservaAulaColetiva $reserva): View
+    {
+        return view('reserva-aulas-coletivas.edit', ['reserva' => $reserva->load(['aula', 'aluno'])]);
+    }
+
+    public function update(Request $request, ReservaAulaColetiva $reserva): RedirectResponse
     {
         $validated = $request->validate([
             'status' => ['required', Rule::in(['confirmada', 'cancelada', 'presenca_confirmada'])],
         ]);
 
-        $reservaAulaColetiva->update($validated);
+        $reserva->update($validated);
 
-        return response()->json($reservaAulaColetiva->load(['aula', 'aluno']));
+        return redirect()->route('reserva-aulas-coletivas.index')->with('success', 'Reserva atualizada com sucesso!');
     }
 
-    /**
-     * Exclui fisicamente ou cancela uma reserva.
-     */
-    public function destroy(ReservaAulaColetiva $reservaAulaColetiva): JsonResponse
+    public function destroy(ReservaAulaColetiva $reserva): RedirectResponse
     {
-        $reservaAulaColetiva->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        $reserva->delete();
+        return redirect()->route('reserva-aulas-coletivas.index')->with('success', 'Reserva cancelada com sucesso!');
     }
 }
