@@ -17,8 +17,9 @@
         </div>
         <nav>
             <a href="{{ route('home') }}">Início</a>
-            <a href="{{ route('planos') }}">Planos</a>
+            <a href="{{ route('planos') }}" class="active">Planos</a>
             <a href="{{ route('contato') }}">Contato</a>
+            <a href="{{ route('login') }}">Login</a>{{-- ALTERAÇÃO: link Login adicionado --}}
             <a href="{{ route('planos') }}" class="btn-nav">Matricule-se</a>
         </nav>
     </header>
