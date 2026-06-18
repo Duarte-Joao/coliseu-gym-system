@@ -4,89 +4,88 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Instrutor;
 use App\Models\Treino;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class TreinoController extends Controller
 {
-    /**
-     * Exibe a listagem de templates de treino.
-     */ 
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $instrutorId = $request->query('instrutor_id');
-        $nome = $request->query('nome');
-
         $query = Treino::query()->with('instrutor.usuario');
 
-        if ($instrutorId) {
-            $query->where('instrutor_id', $instrutorId);
+        if ($request->filled('instrutor_id')) {
+            $query->where('instrutor_id', $request->instrutor_id);
+        }
+        if ($request->filled('nome')) {
+            $query->where('nome', 'like', "%{$request->nome}%");
         }
 
-        if ($nome) {
-            $query->where('nome', 'like', "%{$nome}%");
-        }
+        $treinos = $query->paginate(15)->withQueryString();
+        $instrutores = Instrutor::with('usuario')->get();
 
-        $treinos = $query->paginate(15);
-
-        return response()->json($treinos);
+        return view('treinos.index', compact('treinos', 'instrutores'));
     }
 
-        public function store(Request $request): JsonResponse
+    public function create(): View
+    {
+        $instrutores = Instrutor::with('usuario')->get();
+        return view('treinos.create', compact('instrutores'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'instrutor_id' => 'required|exists:instrutores,id',
-            'nome' => 'required|string|max:255',
-            'obs' => 'nullable|string',
-            'exercicios' => 'required|array',
-            'exercicios.*.nome' => 'required|string|max:255',
-            'exercicios.*.series' => 'required|integer|min:1',
-            'exercicios.*.repeticoes' => 'required|integer|min:1',
-            'exercicios.*.carga' => 'required|numeric|min:0',
+            'instrutor_id'             => 'required|exists:instrutores,id',
+            'nome'                     => 'required|string|max:255',
+            'obs'                      => 'nullable|string',
+            'exercicios'               => 'required|array|min:1',
+            'exercicios.*.nome'        => 'required|string|max:255',
+            'exercicios.*.series'      => 'required|integer|min:1',
+            'exercicios.*.repeticoes'  => 'required|integer|min:1',
+            'exercicios.*.carga'       => 'required|numeric|min:0',
         ]);
 
-        $treino = Treino::create($validated);
+        Treino::create($validated);
 
-        return response()->json($treino->load('instrutor.usuario'), Response::HTTP_CREATED);
+        return redirect()->route('treinos.index')->with('success', 'Treino criado com sucesso!');
     }
 
-    /**
-     * Exibe os detalhes de um treino.
-     */
-    public function show(Treino $treino): JsonResponse
+    public function show(Treino $treino): View
     {
-        return response()->json($treino->load(['instrutor.usuario', 'treinoAlunos.aluno']));
+        return view('treinos.show', [
+            'treino' => $treino->load(['instrutor.usuario', 'treinoAlunos.aluno']),
+        ]);
     }
 
-    /**
-     * Atualiza as informações de um treino.
-     */
-    public function update(Request $request, Treino $treino): JsonResponse
+    public function edit(Treino $treino): View
+    {
+        $instrutores = Instrutor::with('usuario')->get();
+        return view('treinos.edit', compact('treino', 'instrutores'));
+    }
+
+    public function update(Request $request, Treino $treino): RedirectResponse
     {
         $validated = $request->validate([
-            'nome' => 'sometimes|required|string|max:255',
-            'obs' => 'nullable|string',
-            'exercicios' => 'sometimes|required|array',
-            'exercicios.*.nome' => 'sometimes|required|string|max:255',
-            'exercicios.*.series' => 'sometimes|required|integer|min:1',
-            'exercicios.*.repeticoes' => 'sometimes|required|integer|min:1',
-            'exercicios.*.carga' => 'sometimes|required|numeric|min:0',
+            'nome'                     => 'required|string|max:255',
+            'obs'                      => 'nullable|string',
+            'exercicios'               => 'required|array|min:1',
+            'exercicios.*.nome'        => 'required|string|max:255',
+            'exercicios.*.series'      => 'required|integer|min:1',
+            'exercicios.*.repeticoes'  => 'required|integer|min:1',
+            'exercicios.*.carga'       => 'required|numeric|min:0',
         ]);
 
         $treino->update($validated);
 
-        return response()->json($treino->load('instrutor.usuario'));
+        return redirect()->route('treinos.show', $treino)->with('success', 'Treino atualizado com sucesso!');
     }
 
-    /**
-     * Exclui logicamente um treino.
-     */
-    public function destroy(Treino $treino): JsonResponse
+    public function destroy(Treino $treino): RedirectResponse
     {
         $treino->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return redirect()->route('treinos.index')->with('success', 'Treino excluído com sucesso!');
     }
 }

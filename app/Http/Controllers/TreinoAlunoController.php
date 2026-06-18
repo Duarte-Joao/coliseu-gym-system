@@ -4,85 +4,81 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\Treino;
 use App\Models\TreinoAluno;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 
 class TreinoAlunoController extends Controller
 {
-    /**
-     * Exibe a listagem de atribuições de treinos a alunos.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $usuarioId = $request->query('usuario_id');
-        $treinoId = $request->query('treino_id');
-
         $query = TreinoAluno::query()->with(['aluno', 'treino.instrutor.usuario']);
 
-        if ($usuarioId) {
-            $query->where('usuario_id', $usuarioId);
+        if ($request->filled('usuario_id')) {
+            $query->where('usuario_id', $request->usuario_id);
+        }
+        if ($request->filled('treino_id')) {
+            $query->where('treino_id', $request->treino_id);
         }
 
-        if ($treinoId) {
-            $query->where('treino_id', $treinoId);
-        }
+        $atribuicoes = $query->paginate(15)->withQueryString();
 
-        $atribuicoes = $query->paginate(15);
-
-        return response()->json($atribuicoes);
+        return view('treino-alunos.index', compact('atribuicoes'));
     }
 
-    /**
-     * Atribui um novo treino a um aluno.
-     */
-    public function store(Request $request): JsonResponse
+    public function create(): View
+    {
+        $usuarios = User::where('tipo', 'aluno')->orWhereNull('tipo')->get();
+        $treinos  = Treino::with('instrutor.usuario')->get();
+        return view('treino-alunos.create', compact('usuarios', 'treinos'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'usuario_id' => 'required|exists:users,id',
-            'treino_id' => 'required|exists:treinos,id',
+            'usuario_id'  => 'required|exists:users,id',
+            'treino_id'   => 'required|exists:treinos,id',
             'data_inicio' => 'required|date',
-            'data_fim' => 'nullable|date|after_or_equal:data_inicio',
-            'descricao' => 'nullable|string|max:255',
+            'data_fim'    => 'nullable|date|after_or_equal:data_inicio',
+            'descricao'   => 'nullable|string|max:255',
         ]);
 
-        $treinoAluno = TreinoAluno::create($validated);
+        TreinoAluno::create($validated);
 
-        return response()->json($treinoAluno->load(['aluno', 'treino']), Response::HTTP_CREATED);
+        return redirect()->route('treino-alunos.index')->with('success', 'Treino atribuído ao aluno com sucesso!');
     }
 
-    /**
-     * Exibe os detalhes de uma atribuição de treino específica.
-     */
-    public function show(TreinoAluno $treinoAluno): JsonResponse
+    public function show(TreinoAluno $treinoAluno): View
     {
-        return response()->json($treinoAluno->load(['aluno', 'treino.instrutor.usuario']));
+        return view('treino-alunos.show', [
+            'atribuicao' => $treinoAluno->load(['aluno', 'treino.instrutor.usuario']),
+        ]);
     }
 
-    /**
-     * Atualiza as informações de atribuição (ex: data fim ao concluir/mudar o treino).
-     */
-    public function update(Request $request, TreinoAluno $treinoAluno): JsonResponse
+    public function edit(TreinoAluno $treinoAluno): View
+    {
+        return view('treino-alunos.edit', ['atribuicao' => $treinoAluno]);
+    }
+
+    public function update(Request $request, TreinoAluno $treinoAluno): RedirectResponse
     {
         $validated = $request->validate([
-            'data_inicio' => 'sometimes|required|date',
-            'data_fim' => 'nullable|date|after_or_equal:data_inicio',
-            'descricao' => 'nullable|string|max:255',
+            'data_inicio' => 'required|date',
+            'data_fim'    => 'nullable|date|after_or_equal:data_inicio',
+            'descricao'   => 'nullable|string|max:255',
         ]);
 
         $treinoAluno->update($validated);
 
-        return response()->json($treinoAluno->load(['aluno', 'treino']));
+        return redirect()->route('treino-alunos.index')->with('success', 'Atribuição atualizada com sucesso!');
     }
 
-    /**
-     * Remove a atribuição de um treino.
-     */
-    public function destroy(TreinoAluno $treinoAluno): JsonResponse
+    public function destroy(TreinoAluno $treinoAluno): RedirectResponse
     {
         $treinoAluno->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return redirect()->route('treino-alunos.index')->with('success', 'Atribuição removida com sucesso!');
     }
 }

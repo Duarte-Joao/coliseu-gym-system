@@ -5,94 +5,90 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\AulaColetiva;
-use Illuminate\Http\JsonResponse;
+use App\Models\Instrutor;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class AulaColetivaController extends Controller
 {
-    /**
-     * Exibe a listagem de aulas coletivas.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $instrutorId = $request->query('instrutor_id');
-        $modalidade = $request->query('modalidade');
-        $status = $request->query('status');
+        $query = AulaColetiva::query()->with(['instrutor.usuario'])->withCount('reservas');
 
-        $query = AulaColetiva::query()->with(['instrutor.usuario', 'reservas']);
-
-        if ($instrutorId) {
-            $query->where('instrutor_id', $instrutorId);
+        if ($request->filled('instrutor_id')) {
+            $query->where('instrutor_id', $request->instrutor_id);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
-        if ($modalidade) {
-            $query->where('modalidade', 'like', "%{$modalidade}%");
-        }
+        $aulas = $query->paginate(15)->withQueryString();
+        $instrutores = Instrutor::with('usuario')->get();
 
-        if ($status) {
-            $query->where('status', $status);
-        }
-
-        $aulas = $query->paginate(15);
-
-        return response()->json($aulas);
+        return view('aulas-coletivas.index', compact('aulas', 'instrutores'));
     }
 
-    /**
-     * Cria uma nova aula coletiva na grade.
-     */
-    public function store(Request $request): JsonResponse
+    public function create(): View
+    {
+        $instrutores = Instrutor::with('usuario')->get();
+        return view('aulas-coletivas.create', compact('instrutores'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
             'instrutor_id' => 'required|exists:instrutores,id',
-            'datahora' => 'required|date_format:Y-m-d H:i:s',
-            'vagas' => 'required|integer|min:1',
-            'obs' => 'nullable|string',
-            'status' => ['nullable', Rule::in(['agendada', 'cancelada', 'realizada'])],
-            'modalidade' => 'required|string|max:255',
+            'datahora'     => 'required|date',
+            'vagas'        => 'required|integer|min:1',
+            'obs'          => 'nullable|string',
+            'status'       => ['nullable', Rule::in(['agendada', 'cancelada', 'realizada'])],
+            'modalidade'   => 'required|string|max:255',
         ]);
 
-        $aula = AulaColetiva::create($validated);
+        $validated['datahora'] = str_replace('T', ' ', $validated['datahora']);
+        $validated['status'] = $validated['status'] ?? 'agendada';
 
-        return response()->json($aula->load('instrutor.usuario'), Response::HTTP_CREATED);
+        AulaColetiva::create($validated);
+
+        return redirect()->route('aulas-coletivas.index')->with('success', 'Aula coletiva criada com sucesso!');
     }
 
-    /**
-     * Exibe os detalhes de uma aula coletiva específica.
-     */
-    public function show(AulaColetiva $aulaColetiva): JsonResponse
+    public function show(AulaColetiva $aula): View
     {
-        return response()->json($aulaColetiva->load(['instrutor.usuario', 'reservas.aluno']));
+        return view('aulas-coletivas.show', [
+            'aula' => $aula->load(['instrutor.usuario', 'reservas.aluno']),
+        ]);
     }
 
-    /**
-     * Atualiza as informações de uma aula coletiva.
-     */
-    public function update(Request $request, AulaColetiva $aulaColetiva): JsonResponse
+    public function edit(AulaColetiva $aula): View
+    {
+        $instrutores = Instrutor::with('usuario')->get();
+        return view('aulas-coletivas.edit', compact('aula', 'instrutores'));
+    }
+
+    public function update(Request $request, AulaColetiva $aula): RedirectResponse
     {
         $validated = $request->validate([
-            'instrutor_id' => 'sometimes|required|exists:instrutores,id',
-            'datahora' => 'sometimes|required|date_format:Y-m-d H:i:s',
-            'vagas' => 'sometimes|required|integer|min:1',
-            'obs' => 'nullable|string',
-            'status' => ['sometimes', 'required', Rule::in(['agendada', 'cancelada', 'realizada'])],
-            'modalidade' => 'sometimes|required|string|max:255',
+            'instrutor_id' => 'required|exists:instrutores,id',
+            'datahora'     => 'required|date',
+            'vagas'        => 'required|integer|min:1',
+            'obs'          => 'nullable|string',
+            'status'       => ['required', Rule::in(['agendada', 'cancelada', 'realizada'])],
+            'modalidade'   => 'required|string|max:255',
         ]);
 
-        $aulaColetiva->update($validated);
+        $validated['datahora'] = str_replace('T', ' ', $validated['datahora']);
 
-        return response()->json($aulaColetiva->load('instrutor.usuario'));
+        $aula->update($validated);
+
+        return redirect()->route('aulas-coletivas.show', $aula)->with('success', 'Aula atualizada com sucesso!');
     }
 
-    /**
-     * Cancela ou exclui logicamente uma aula coletiva.
-     */
-    public function destroy(AulaColetiva $aulaColetiva): JsonResponse
+    public function destroy(AulaColetiva $aula): RedirectResponse
     {
-        $aulaColetiva->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        $aula->delete();
+        return redirect()->route('aulas-coletivas.index')->with('success', 'Aula excluída com sucesso!');
     }
 }

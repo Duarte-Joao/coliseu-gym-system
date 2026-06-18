@@ -540,7 +540,7 @@
 
           <div class="fg">
             <label for="input-email-cadastro">E-mail <span class="req">*</span></label>
-            <input type="email" name="email_cadastro" id="input-email-cadastro"
+            <input type="email" name="email" id="input-email-cadastro"
                    placeholder="guerreiro@email.com" class="form-input">
           </div>
 
@@ -548,7 +548,7 @@
             <div class="fg">
               <label for="password_cadastro">Definir senha <span class="req">*</span></label>
               <div class="pwd-wrap">
-                <input type="password" name="password_cadastro" id="password_cadastro"
+                <input type="password" name="password" id="password_cadastro"
                        placeholder="••••••••" class="form-input">
                 {{-- ALTERAÇÃO 5: emoji 👁️ substituído pelo SVG VisibilityIcon do MUI --}}
                 <button type="button" class="pwd-toggle" onclick="togglePwd('password_cadastro', this)">
@@ -620,7 +620,7 @@
 
           <div class="fg">
             <label for="input-numero">Número</label>
-            <input type="number" name="numero_street" id="input-numero"
+            <input type="number" name="numero_rua" id="input-numero"
                    placeholder="Ex: 1420" class="form-input">
           </div>
 
