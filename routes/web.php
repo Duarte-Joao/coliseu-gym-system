@@ -1,5 +1,6 @@
 <?php
 
+use App\Actions\Fortify\CreateNewUser;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
 
@@ -30,7 +31,8 @@ Route::post('/login', function (Request $request) {
     return redirect()->route('dashboard.aluno');
 })->name('login.post');
 
-Route::post('/cadastro', function () { 
+Route::post('/cadastro', function (Request $request) {
+    (new CreateNewUser())->create($request->all());
     return redirect()->route('dashboard.aluno');
 })->name('register.post');
 

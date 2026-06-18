@@ -53,7 +53,7 @@ class ReservaAulaColetivaController extends Controller
             'status' => ['nullable', Rule::in(['confirmada', 'cancelada', 'presenca_confirmada'])],
         ]);
 
-        $aula = AulaColetiva::withCount('reservas')->findOrFail($validated['aula_coletiva_id']);
+        $aula = AulaColetiva::findOrFail($validated['aula_coletiva_id']);
         
         $reservasAtivasCount = ReservaAulaColetiva::where('aula_coletiva_id', $aula->id)
             ->where('status', '!=', 'cancelada')

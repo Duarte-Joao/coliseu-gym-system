@@ -8,7 +8,6 @@ use App\Models\User;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
@@ -55,8 +54,6 @@ class UserController extends Controller
             'tipo' => ['nullable', Rule::in(['aluno', 'instrutor', 'admin'])],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-        
         $usuario = User::create($validated);
 
         return response()->json($usuario, Response::HTTP_CREATED);
@@ -89,9 +86,7 @@ class UserController extends Controller
             'tipo' => ['nullable', Rule::in(['aluno', 'instrutor', 'admin'])],
         ]);
 
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
+        if (!isset($validated['password'])) {
             unset($validated['password']);
         }
 

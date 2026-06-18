@@ -72,7 +72,7 @@ class PlanoAlunoController extends Controller
             'valor' => 'sometimes|required|numeric|min:0',
             'duracao_meses' => 'sometimes|required|integer|min:1',
             'data_inicio' => 'sometimes|required|date',
-            'data_fim' => 'sometimes|required|date|after:data_inicio',
+            'data_fim' => 'sometimes|required|date|after_or_equal:data_inicio',
         ]);
 
         $planoAluno->update($validated);
