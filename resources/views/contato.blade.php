@@ -264,6 +264,7 @@
       outline: none;
       transition: border-color 0.2s, box-shadow 0.2s;
     }
+
     .form-input:focus {
       border-color: var(--p1);
       box-shadow: 0 0 0 3px rgba(139,92,246,0.1);
@@ -276,12 +277,20 @@
       font-family: 'Barlow', sans-serif;
       line-height: 1.6;
     }
+<<<<<<< HEAD
 
     .form-input option {
       color: var(--txt);
       background-color: #1f1f27ff;
     }
 
+=======
+    
+    .form-input option {
+      color: var(--txt);
+      background-color: rgb(27, 27, 36);
+    }
+>>>>>>> 6e2f3b07d32092eee3e3a86ccbc10709a4c5d3ae
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;
@@ -363,7 +372,7 @@
   <header class="navbar">
     <div class="logo">
       Coliseu <span>Gym</span>
-      <small>Desde 2015 · Chapecó — SC</small>
+      <small>Desde 2026 · Chapecó — SC</small>
     </div>
     <nav>
       <a href="{{ route('home') }}">Início</a>
@@ -414,7 +423,7 @@
         <div class="divider"></div>
 
         <a href="https://wa.me/554933334444" target="_blank" rel="noopener" class="btn-wa">
-          💬 Chamar no WhatsApp
+           Chamar no WhatsApp
         </a>
       </div>
 
@@ -429,7 +438,7 @@
             <div class="fg">
               <label for="nome">Nome completo <span class="req">*</span></label>
               <input type="text" name="nome" id="nome"
-                     placeholder="Ex: Maximus Decimus"
+                     placeholder="Ex: Jackson Five"
                      class="form-input" required>
             </div>
             <div class="fg">
@@ -466,7 +475,7 @@
           </div>
 
           <button type="submit" class="btn-submit">
-            ✉️ Enviar Mensagem
+             Enviar Mensagem
           </button>
         </form>
       </div>
