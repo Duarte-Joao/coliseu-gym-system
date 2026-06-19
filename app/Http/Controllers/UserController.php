@@ -4,6 +4,9 @@ declare(strict_types=1);
 
 namespace App\Http\Controllers;
 
+use App\Models\PlanoAluno;
+use App\Models\Treino;
+use App\Models\TreinoAluno;
 use App\Models\User;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
@@ -49,7 +52,29 @@ class UserController extends Controller
             'tipo'            => ['required', Rule::in(['aluno', 'instrutor', 'admin'])],
         ]);
 
-        User::create($validated);
+        $user = User::create($validated);
+
+        // Criação opcional de plano e ficha (formulário do dashboard do instrutor)
+        if ($request->filled('plano_tipo')) {
+            $duracoes = ['Mensal' => 1, 'Trimestral' => 3, 'Semestral' => 6, 'Anual' => 12];
+            $meses = $duracoes[$request->plano_tipo] ?? 1;
+            PlanoAluno::create([
+                'usuario_id'    => $user->id,
+                'tipo'          => $request->plano_tipo,
+                'valor'         => 0,
+                'duracao_meses' => $meses,
+                'data_inicio'   => now()->toDateString(),
+                'data_fim'      => now()->addMonths($meses)->toDateString(),
+            ]);
+        }
+
+        if ($request->filled('treino_id') && Treino::where('id', $request->treino_id)->exists()) {
+            TreinoAluno::create([
+                'usuario_id'  => $user->id,
+                'treino_id'   => $request->treino_id,
+                'data_inicio' => now()->toDateString(),
+            ]);
+        }
 
         return redirect()->route('usuarios.index')->with('success', 'Usuário criado com sucesso!');
     }

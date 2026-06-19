@@ -19,11 +19,6 @@ class Instrutor extends Model
      */
     protected $table = 'instrutores';
 
-    /**
-     * Get the attributes that should be cast.
-     *
-     * @return array<string, string>
-     */
     protected function casts(): array
     {
         return [
@@ -39,17 +34,12 @@ class Instrutor extends Model
         return $this->belongsTo(User::class, 'usuario_id');
     }
 
-    /**
-     * Relacionamento 1:N com Treinos criados por este instrutor
-     */
+
     public function treinos(): HasMany
     {
         return $this->hasMany(Treino::class, 'instrutor_id');
     }
 
-    /**
-     * Relacionamento 1:N com Aulas Coletivas ministradas por este instrutor
-     */
     public function aulasColetivas(): HasMany
     {
         return $this->hasMany(AulaColetiva::class, 'instrutor_id');

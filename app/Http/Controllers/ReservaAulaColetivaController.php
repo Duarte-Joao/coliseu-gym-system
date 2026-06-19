@@ -69,7 +69,12 @@ class ReservaAulaColetivaController extends Controller
 
         ReservaAulaColetiva::create($validated);
 
-        return redirect()->route('reserva-aulas-coletivas.index')->with('success', 'Reserva realizada com sucesso!');
+        $from = $request->input('_from');
+        $redirect = $from === 'aluno-dashboard'
+            ? redirect()->route('dashboard.aluno')
+            : redirect()->route('reserva-aulas-coletivas.index');
+
+        return $redirect->with('success', 'Reserva realizada com sucesso!');
     }
 
     public function show(ReservaAulaColetiva $reserva): View
