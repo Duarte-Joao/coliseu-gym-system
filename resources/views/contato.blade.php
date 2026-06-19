@@ -277,11 +277,20 @@
       font-family: 'Barlow', sans-serif;
       line-height: 1.6;
     }
+<<<<<<< HEAD
+
+    .form-input option {
+      color: var(--txt);
+      background-color: #1f1f27ff;
+    }
+
+=======
     
     .form-input option {
       color: var(--txt);
       background-color: rgb(27, 27, 36);
     }
+>>>>>>> 6e2f3b07d32092eee3e3a86ccbc10709a4c5d3ae
     .form-row {
       display: grid;
       grid-template-columns: 1fr 1fr;

@@ -5,108 +5,90 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\User;
-use Illuminate\Http\JsonResponse;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
-use Illuminate\Support\Facades\Hash;
 use Illuminate\Validation\Rule;
 
 class UserController extends Controller
 {
-    /**
-     * Exibe a listagem de usuários do sistema.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $tipo = $request->query('tipo');
-        $status = $request->query('status');
-
         $query = User::query();
 
-        if ($tipo) {
-            $query->where('tipo', $tipo);
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
-        if ($status) {
-            $query->where('status', $status);
-        }
+        $usuarios = $query->paginate(15)->withQueryString();
 
-        $usuarios = $query->paginate(15);
-
-        return response()->json($usuarios);
+        return view('usuarios.index', compact('usuarios'));
     }
 
-    /**
-     * Armazena um novo usuário.
-     */
-    public function store(Request $request): JsonResponse
+    public function create(): View
+    {
+        return view('usuarios.create');
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users',
-            'password' => 'required|string|min:8',
-            'cpf' => 'required|string|size:14|unique:users',
+            'name'            => 'required|string|max:255',
+            'email'           => 'required|string|email|max:255|unique:users',
+            'password'        => 'required|string|min:8',
+            'cpf'             => 'required|string|size:14|unique:users',
             'data_nascimento' => 'required|date',
-            'rua' => 'required|string|max:255',
-            'numero_rua' => 'required|integer',
-            'cep' => 'required|string|size:9',
+            'rua'             => 'required|string|max:255',
+            'numero_rua'      => 'required|integer',
+            'cep'             => 'required|string|size:9',
             'numero_telefone' => 'required|string|max:20',
-            'status' => ['nullable', Rule::in(['ativo', 'inativo'])],
-            'tipo' => ['nullable', Rule::in(['aluno', 'instrutor', 'admin'])],
+            'status'          => ['required', Rule::in(['ativo', 'inativo'])],
+            'tipo'            => ['required', Rule::in(['aluno', 'instrutor', 'admin'])],
         ]);
 
-        $validated['password'] = Hash::make($validated['password']);
-        
-        $usuario = User::create($validated);
+        User::create($validated);
 
-        return response()->json($usuario, Response::HTTP_CREATED);
+        return redirect()->route('usuarios.index')->with('success', 'Usuário criado com sucesso!');
     }
 
-    /**
-     * Exibe os detalhes de um usuário específico.
-     */
-    public function show(User $user): JsonResponse
+    public function show(User $usuario): View
     {
-        return response()->json($user->load(['instrutor', 'planoAlunos']));
+        return view('usuarios.show', [
+            'usuario' => $usuario->load(['instrutor', 'planoAlunos']),
+        ]);
     }
 
-    /**
-     * Atualiza os dados de um usuário existente.
-     */
-    public function update(Request $request, User $user): JsonResponse
+    public function edit(User $usuario): View
+    {
+        return view('usuarios.edit', compact('usuario'));
+    }
+
+    public function update(Request $request, User $usuario): RedirectResponse
     {
         $validated = $request->validate([
-            'name' => 'sometimes|required|string|max:255',
-            'email' => ['sometimes', 'required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($user->id)],
-            'password' => 'nullable|string|min:8',
-            'cpf' => ['sometimes', 'required', 'string', 'size:14', Rule::unique('users')->ignore($user->id)],
-            'data_nascimento' => 'sometimes|required|date',
-            'rua' => 'sometimes|required|string|max:255',
-            'numero_rua' => 'sometimes|required|integer',
-            'cep' => 'sometimes|required|string|size:9',
-            'numero_telefone' => 'sometimes|required|string|max:20',
-            'status' => ['nullable', Rule::in(['ativo', 'inativo'])],
-            'tipo' => ['nullable', Rule::in(['aluno', 'instrutor', 'admin'])],
+            'name'            => 'required|string|max:255',
+            'email'           => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($usuario->id)],
+            'cpf'             => ['required', 'string', 'size:14', Rule::unique('users')->ignore($usuario->id)],
+            'data_nascimento' => 'required|date',
+            'rua'             => 'required|string|max:255',
+            'numero_rua'      => 'required|integer',
+            'cep'             => 'required|string|size:9',
+            'numero_telefone' => 'required|string|max:20',
+            'status'          => ['required', Rule::in(['ativo', 'inativo'])],
+            'tipo'            => ['required', Rule::in(['aluno', 'instrutor', 'admin'])],
         ]);
 
-        if (isset($validated['password'])) {
-            $validated['password'] = Hash::make($validated['password']);
-        } else {
-            unset($validated['password']);
-        }
+        $usuario->update($validated);
 
-        $user->update($validated);
-
-        return response()->json($user);
+        return redirect()->route('usuarios.show', $usuario)->with('success', 'Usuário atualizado com sucesso!');
     }
 
-    /**
-     * Remove (exclui logicamente) um usuário do sistema.
-     */
-    public function destroy(User $user): JsonResponse
+    public function destroy(User $usuario): RedirectResponse
     {
-        $user->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        $usuario->delete();
+        return redirect()->route('usuarios.index')->with('success', 'Usuário excluído com sucesso!');
     }
 }

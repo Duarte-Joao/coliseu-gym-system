@@ -5,86 +5,80 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\Instrutor;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class InstrutorController extends Controller
 {
-    /**
-     * Exibe a lista de instrutores cadastrados.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $turno = $request->query('turno');
-        $especialidade = $request->query('especialidade');
-
         $query = Instrutor::query()->with('usuario');
 
-        if ($turno) {
-            $query->where('turno', $turno);
+        if ($request->filled('turno')) {
+            $query->where('turno', $request->turno);
+        }
+        if ($request->filled('especialidade')) {
+            $query->where('especialidade', 'like', "%{$request->especialidade}%");
         }
 
-        if ($especialidade) {
-            $query->where('especialidade', 'like', "%{$especialidade}%");
-        }
+        $instrutores = $query->paginate(15)->withQueryString();
 
-        $instrutores = $query->paginate(15);
-
-        return response()->json($instrutores);
+        return view('instrutores.index', compact('instrutores'));
     }
 
-    /**
-     * Cadastra um novo perfil de instrutor.
-     */
-    public function store(Request $request): JsonResponse
+    public function create(): View
+    {
+        $usuarios = User::whereDoesntHave('instrutor')->where('tipo', 'instrutor')->get();
+        return view('instrutores.create', compact('usuarios'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'usuario_id' => 'required|exists:users,id|unique:instrutores,usuario_id',
+            'usuario_id'    => 'required|exists:users,id|unique:instrutores,usuario_id',
             'especialidade' => 'required|string|max:255',
-            'salario' => 'required|numeric|min:0',
-            'carga_hora' => 'required|date_format:H:i:s',
-            'turno' => ['required', 'string', Rule::in(['Manhã', 'Tarde', 'Noite'])],
+            'salario'       => 'required|numeric|min:0',
+            'carga_hora'    => 'required|date_format:H:i:s',
+            'turno'         => ['required', 'string', Rule::in(['Manhã', 'Tarde', 'Noite'])],
         ]);
 
-        $instrutor = Instrutor::create($validated);
+        Instrutor::create($validated);
 
-        return response()->json($instrutor->load('usuario'), Response::HTTP_CREATED);
+        return redirect()->route('instrutores.index')->with('success', 'Instrutor cadastrado com sucesso!');
     }
 
-    /**
-     * Exibe os detalhes de um instrutor específico.
-     */
-    public function show(Instrutor $instrutor): JsonResponse
+    public function show(Instrutor $instrutor): View
     {
-        return response()->json($instrutor->load(['usuario', 'treinos', 'aulasColetivas']));
+        return view('instrutores.show', [
+            'instrutor' => $instrutor->load(['usuario', 'treinos', 'aulasColetivas']),
+        ]);
     }
 
-    /**
-     * Atualiza as informações do instrutor.
-     */
-    public function update(Request $request, Instrutor $instrutor): JsonResponse
+    public function edit(Instrutor $instrutor): View
+    {
+        return view('instrutores.edit', compact('instrutor'));
+    }
+
+    public function update(Request $request, Instrutor $instrutor): RedirectResponse
     {
         $validated = $request->validate([
-            'especialidade' => 'sometimes|required|string|max:255',
-            'salario' => 'sometimes|required|numeric|min:0',
-            'carga_hora' => 'sometimes|required|date_format:H:i:s',
-            'turno' => ['sometimes', 'required', 'string', Rule::in(['Manhã', 'Tarde', 'Noite'])],
+            'especialidade' => 'required|string|max:255',
+            'salario'       => 'required|numeric|min:0',
+            'carga_hora'    => 'required|date_format:H:i:s',
+            'turno'         => ['required', 'string', Rule::in(['Manhã', 'Tarde', 'Noite'])],
         ]);
 
         $instrutor->update($validated);
 
-        return response()->json($instrutor->load('usuario'));
+        return redirect()->route('instrutores.show', $instrutor)->with('success', 'Instrutor atualizado com sucesso!');
     }
 
-    /**
-     * Exclui logicamente o perfil de um instrutor.
-     */
-    public function destroy(Instrutor $instrutor): JsonResponse
+    public function destroy(Instrutor $instrutor): RedirectResponse
     {
         $instrutor->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        return redirect()->route('instrutores.index')->with('success', 'Instrutor excluído com sucesso!');
     }
 }

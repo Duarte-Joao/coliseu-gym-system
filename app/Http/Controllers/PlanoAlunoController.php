@@ -5,88 +5,82 @@ declare(strict_types=1);
 namespace App\Http\Controllers;
 
 use App\Models\PlanoAluno;
-use Illuminate\Http\JsonResponse;
+use App\Models\User;
+use Illuminate\Contracts\View\View;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class PlanoAlunoController extends Controller
 {
-    /**
-     * Exibe a listagem de planos contratados pelos alunos.
-     */
-    public function index(Request $request): JsonResponse
+    public function index(Request $request): View
     {
-        $usuarioId = $request->query('usuario_id');
-        $tipo = $request->query('tipo');
-
         $query = PlanoAluno::query()->with(['aluno', 'pagamentos']);
 
-        if ($usuarioId) {
-            $query->where('usuario_id', $usuarioId);
+        if ($request->filled('usuario_id')) {
+            $query->where('usuario_id', $request->usuario_id);
+        }
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
         }
 
-        if ($tipo) {
-            $query->where('tipo', $tipo);
-        }
+        $planos = $query->paginate(15)->withQueryString();
 
-        $planos = $query->paginate(15);
-
-        return response()->json($planos);
+        return view('plano-alunos.index', compact('planos'));
     }
 
-    /**
-     * Contrata um novo plano para um aluno.
-     */
-    public function store(Request $request): JsonResponse
+    public function create(): View
+    {
+        $usuarios = User::whereIn('tipo', ['aluno'])->orWhereNull('tipo')->get();
+        return view('plano-alunos.create', compact('usuarios'));
+    }
+
+    public function store(Request $request): RedirectResponse
     {
         $validated = $request->validate([
-            'usuario_id' => 'required|exists:users,id',
-            'tipo' => ['required', 'string', Rule::in(['Mensal', 'Trimestral', 'Semestral', 'Anual'])],
-            'valor' => 'required|numeric|min:0',
+            'usuario_id'    => 'required|exists:users,id',
+            'tipo'          => ['required', 'string', Rule::in(['Mensal', 'Trimestral', 'Semestral', 'Anual'])],
+            'valor'         => 'required|numeric|min:0',
             'duracao_meses' => 'required|integer|min:1',
-            'data_inicio' => 'required|date',
-            'data_fim' => 'required|date|after:data_inicio',
+            'data_inicio'   => 'required|date',
+            'data_fim'      => 'required|date|after:data_inicio',
         ]);
 
-        $plano = PlanoAluno::create($validated);
+        PlanoAluno::create($validated);
 
-        return response()->json($plano->load('aluno'), Response::HTTP_CREATED);
+        return redirect()->route('plano-alunos.index')->with('success', 'Plano criado com sucesso!');
     }
 
-    /**
-     * Exibe os detalhes de um plano de aluno específico.
-     */
-    public function show(PlanoAluno $planoAluno): JsonResponse
+    public function show(PlanoAluno $plano): View
     {
-        return response()->json($planoAluno->load(['aluno', 'pagamentos']));
+        return view('plano-alunos.show', [
+            'plano' => $plano->load(['aluno', 'pagamentos']),
+        ]);
     }
 
-    /**
-     * Atualiza as informações do contrato de um plano.
-     */
-    public function update(Request $request, PlanoAluno $planoAluno): JsonResponse
+    public function edit(PlanoAluno $plano): View
+    {
+        return view('plano-alunos.edit', compact('plano'));
+    }
+
+    public function update(Request $request, PlanoAluno $plano): RedirectResponse
     {
         $validated = $request->validate([
-            'tipo' => ['sometimes', 'required', 'string', Rule::in(['Mensal', 'Trimestral', 'Semestral', 'Anual'])],
-            'valor' => 'sometimes|required|numeric|min:0',
-            'duracao_meses' => 'sometimes|required|integer|min:1',
-            'data_inicio' => 'sometimes|required|date',
-            'data_fim' => 'sometimes|required|date|after:data_inicio',
+            'tipo'          => ['required', 'string', Rule::in(['Mensal', 'Trimestral', 'Semestral', 'Anual'])],
+            'valor'         => 'required|numeric|min:0',
+            'duracao_meses' => 'required|integer|min:1',
+            'data_inicio'   => 'required|date',
+            'data_fim'      => 'required|date|after_or_equal:data_inicio',
         ]);
 
-        $planoAluno->update($validated);
+        $plano->update($validated);
 
-        return response()->json($planoAluno->load('aluno'));
+        return redirect()->route('plano-alunos.show', $plano)->with('success', 'Plano atualizado com sucesso!');
     }
 
-    /**
-     * Exclui logicamente o contrato de um plano.
-     */
-    public function destroy(PlanoAluno $planoAluno): JsonResponse
+    public function destroy(PlanoAluno $plano): RedirectResponse
     {
-        $planoAluno->delete();
-
-        return response()->json(null, Response::HTTP_NO_CONTENT);
+        $plano->delete();
+        return redirect()->route('plano-alunos.index')->with('success', 'Plano excluído com sucesso!');
     }
 }

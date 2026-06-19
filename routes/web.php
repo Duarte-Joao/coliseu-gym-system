@@ -1,6 +1,14 @@
 <?php
 
-use Illuminate\Support\Facades\Route;
+use App\Actions\Fortify\CreateNewUser;
+use App\Http\Controllers\AulaColetivaController;
+use App\Http\Controllers\InstrutorController;
+use App\Http\Controllers\PagamentoPlanoAlunoController;
+use App\Http\Controllers\PlanoAlunoController;
+use App\Http\Controllers\ReservaAulaColetivaController;
+use App\Http\Controllers\TreinoAlunoController;
+use App\Http\Controllers\TreinoController;
+use App\Http\Controllers\UserController;
 use Illuminate\Http\Request;
 use App\Http\Controllers\InstrutorDashboardController;
 use App\Http\Controllers\UserController;
@@ -15,6 +23,7 @@ use App\Http\Controllers\PagamentoPlanoAlunoController;
 // ── PÁGINAS PÚBLICAS ────────────────────────────────────────
 Route::view('/', 'welcome')->name('home');
 Route::view('/planos', 'planos')->name('planos');
+Route::any('/contato', fn () => view('contato'))->name('contato');
 
 Route::any('/contato', function () {
     return view('contato');
