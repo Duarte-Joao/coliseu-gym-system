@@ -3,6 +3,7 @@
 use App\Actions\Fortify\CreateNewUser;
 use App\Http\Controllers\AulaColetivaController;
 use App\Http\Controllers\InstrutorController;
+use App\Http\Controllers\InstrutorDashboardController;
 use App\Http\Controllers\PagamentoPlanoAlunoController;
 use App\Http\Controllers\PlanoAlunoController;
 use App\Http\Controllers\ReservaAulaColetivaController;
@@ -14,7 +15,7 @@ use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Route;
 
-// ROTAS PÚBLICAS
+// ── PÁGINAS PÚBLICAS ────────────────────────────────────────
 Route::view('/', 'welcome')->name('home');
 Route::get('/planos', function () {
     $planosDisponiveis = [
@@ -85,7 +86,9 @@ Route::get('/planos', function () {
 })->name('planos');
 Route::any('/contato', fn () => view('contato'))->name('contato');
 
+// ── LOGIN / LOGOUT ──────────────────────────────────────────
 Route::get('/login', fn () => view('login'))->name('login');
+
 Route::post('/logout', function (Request $request) {
     Auth::logout();
     $request->session()->invalidate();
@@ -98,15 +101,15 @@ Route::post('/login', function (Request $request) {
         'email' => 'required|email',
         'password' => 'required'
     ]);
-    
+
     if (Auth::attempt($credentials, $request->has('remember'))) {
         $request->session()->regenerate();
         $user = Auth::user();
-        return $user->tipo === 'instrutor' 
+        return $user->tipo === 'instrutor'
             ? redirect()->route('dashboard.instrutor')
             : redirect()->route('dashboard.aluno');
     }
-    
+
     return back()->withErrors([
         'email' => 'E-mail ou senha incorretos.'
     ])->onlyInput('email');
@@ -119,14 +122,14 @@ Route::post('/cadastro', function (Request $request) {
     return redirect()->route('dashboard.aluno');
 })->name('register.post');
 
-// DASHBOARDS (PROTEGIDOS)
+// ── DASHBOARDS (PROTEGIDOS) ─────────────────────────────────
 Route::middleware('auth')->group(function () {
     Route::get('/dashboard-aluno', function () {
         $user = Auth::user();
         $treinos = $user->treinoAlunos()->with('treino.instrutor.usuario')->get();
         return view('aluno.dashboard', compact('treinos'));
     })->name('dashboard.aluno');
-    
+
     Route::get('/dashboard-instrutor', function () {
         $user = Auth::user();
         $instrutorData = $user->instrutor;
@@ -135,7 +138,7 @@ Route::middleware('auth')->group(function () {
     })->name('dashboard.instrutor');
 });
 
-// CRUD RESOURCES
+// ── RECURSOS (CRUD completo de cada módulo) ─────────────────
 Route::resource('treinos', TreinoController::class);
 Route::resource('instrutores', InstrutorController::class);
 Route::resource('usuarios', UserController::class);
@@ -151,10 +154,5 @@ Route::get('treino-alunos/{treinoAluno}/pdf', [TreinoAlunoController::class, 'pd
     ->name('treino-alunos.pdf');
 Route::resource('treino-alunos', TreinoAlunoController::class)
     ->parameters(['treino-alunos' => 'treinoAluno']);
-
-// ROTA PROTEGIDA (Fortify)
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
-});
 
 require __DIR__.'/settings.php';
