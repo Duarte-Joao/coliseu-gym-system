@@ -7,9 +7,11 @@ namespace App\Http\Controllers;
 use App\Models\Treino;
 use App\Models\TreinoAluno;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 
 class TreinoAlunoController extends Controller
 {
@@ -80,5 +82,17 @@ class TreinoAlunoController extends Controller
     {
         $treinoAluno->delete();
         return redirect()->route('treino-alunos.index')->with('success', 'Atribuição removida com sucesso!');
+    }
+
+    //PDFs
+    public function pdf(TreinoAluno $treinoAluno)
+    {
+        $atribuicao = $treinoAluno->load(['aluno', 'treino.instrutor.usuario']);
+
+        $pdf = Pdf::loadView('treino-alunos.pdf', [
+            'atribuicao' => $atribuicao,
+        ]);
+
+        return $pdf->download('treino-semanal-'.$atribuicao->id.'.pdf');
     }
 }

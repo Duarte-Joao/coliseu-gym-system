@@ -483,6 +483,18 @@
         <input type="hidden" name="status"                                  value="ativo">
         <input type="hidden" name="acao_formulario"   id="acao_formulario"  value="login">
 
+        {{-- MENSAGENS DE ERRO --}}
+        @if ($errors->any())
+        <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #f87171;">
+            <strong>Erro:</strong>
+            <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                @foreach ($errors->all() as $error)
+                <li style="margin: 0.25rem 0;">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
         <!-- ── PARTE DO LOGIN ── -->
         <div id="bloco-login" class="form-block visible">
 
@@ -694,6 +706,24 @@
               .classList.add('visible');
     }
 
+    function setFormMode(acao) {
+      const loginInputs = document.querySelectorAll('#bloco-login input');
+      const cadastroInputs = document.querySelectorAll('#cadastro-passo-1 input, #cadastro-passo-2 input');
+      const isLoginMode = acao === 'login';
+
+      loginInputs.forEach(input => {
+        if (input.type !== 'hidden') {
+          input.disabled = !isLoginMode;
+        }
+      });
+
+      cadastroInputs.forEach(input => {
+        if (input.type !== 'hidden') {
+          input.disabled = isLoginMode;
+        }
+      });
+    }
+
     // muda entre os do  perfil Aluno e Instrutor
     function mudarPerfil(perfil) {
       limparFormulario();
@@ -720,6 +750,7 @@
         // coloca de novo o tal do  required para o bloco de login do instrutor
         document.getElementById('input-email').required  = true;
         document.getElementById('password').required     = true;
+        setFormMode('login');
 
         document.getElementById('bloco-login').classList.add('visible');
         document.getElementById('btn-submit').textContent = 'Acessar Painel';
@@ -741,6 +772,7 @@
 
         document.getElementById('input-email').required = true;
         document.getElementById('password').required    = true;
+        setFormMode('login');
 
         ocultarTodos();
         document.getElementById('bloco-login').classList.add('visible');
@@ -754,11 +786,15 @@
         // Desativa required dos campos de login para não bloquear o submit do cadastro
         document.getElementById('input-email').required = false;
         document.getElementById('password').required    = false;
+        setFormMode('cadastro');
 
         ocultarTodos();
         document.getElementById('cadastro-passo-1').classList.add('visible');
       }
     }
+
+    // inicializa o formulário no modo login, com campos de cadastro desabilitados
+    setFormMode('login');
   </script>
 </body>
 </html>

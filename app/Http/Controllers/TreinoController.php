@@ -9,6 +9,7 @@ use App\Models\Treino;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Storage;
 
 class TreinoController extends Controller
 {
@@ -46,11 +47,33 @@ class TreinoController extends Controller
             'exercicios.*.series'      => 'required|integer|min:1',
             'exercicios.*.repeticoes'  => 'required|integer|min:1',
             'exercicios.*.carga'       => 'required|numeric|min:0',
+            'exercicios.*.imagem'      => 'nullable|image|max:2048',
         ]);
+
+        $validated['exercicios'] = $this->processExercicios($request, $validated['exercicios']);
 
         Treino::create($validated);
 
         return redirect()->route('treinos.index')->with('success', 'Treino criado com sucesso!');
+    }
+
+    private function processExercicios(Request $request, array $exercicios): array
+    {
+        foreach ($exercicios as $index => &$exercicio) {
+            $imagem = $request->file("exercicios.{$index}.imagem");
+
+            if ($imagem) {
+                $exercicio['imagem'] = $imagem->store('treinos/exercicios', 'public');
+            } elseif (!empty($exercicio['imagem_antiga'])) {
+                $exercicio['imagem'] = $exercicio['imagem_antiga'];
+            } else {
+                $exercicio['imagem'] = null;
+            }
+
+            unset($exercicio['imagem_antiga']);
+        }
+
+        return $exercicios;
     }
 
     public function show(Treino $treino): View
@@ -69,14 +92,18 @@ class TreinoController extends Controller
     public function update(Request $request, Treino $treino): RedirectResponse
     {
         $validated = $request->validate([
-            'nome'                     => 'required|string|max:255',
-            'obs'                      => 'nullable|string',
-            'exercicios'               => 'required|array|min:1',
-            'exercicios.*.nome'        => 'required|string|max:255',
-            'exercicios.*.series'      => 'required|integer|min:1',
-            'exercicios.*.repeticoes'  => 'required|integer|min:1',
-            'exercicios.*.carga'       => 'required|numeric|min:0',
+            'nome'                       => 'required|string|max:255',
+            'obs'                        => 'nullable|string',
+            'exercicios'                 => 'required|array|min:1',
+            'exercicios.*.nome'          => 'required|string|max:255',
+            'exercicios.*.series'        => 'required|integer|min:1',
+            'exercicios.*.repeticoes'    => 'required|integer|min:1',
+            'exercicios.*.carga'         => 'required|numeric|min:0',
+            'exercicios.*.imagem'        => 'nullable|image|max:2048',
+            'exercicios.*.imagem_antiga' => 'nullable|string',
         ]);
+
+        $validated['exercicios'] = $this->processExercicios($request, $validated['exercicios']);
 
         $treino->update($validated);
 

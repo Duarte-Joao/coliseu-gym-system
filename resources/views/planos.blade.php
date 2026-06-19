@@ -35,72 +35,24 @@
         <!-- Grade de Planos Dinâmica com base na sua Factory -->
         <div class="plans-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
             
-            <!-- PLANO MENSAL -->
-            <div class="plan-card">
-                <div class="plan-name">Mensal</div>
-                <div class="plan-price">R$ 119<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: var(--gold); margin-top: 0.3rem;">Adesão padrão de 1 mês</p>
-                
-                <div class="plan-divider"></div>
-                <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso total à musculação</li>
-                    <li>Livre escolha de horários</li>
-                    <li>Sem fidelidade ou contrato</li>
-                    <li>Renovação mensal opcional</li>
-                </ul>
-                <a href="#" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
-            </div>
-
-            <!-- PLANO TRIMESTRAL -->
-            <div class="plan-card">
-                <div class="plan-name">Trimestral</div>
-                <div class="plan-price">R$ 299<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: var(--white-60); margin-top: 0.3rem;">Equivale a R$ 99,96/mês</p>
-                
-                <div class="plan-divider"></div>
-                <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso total à musculação</li>
-                    <li>Válido por 3 meses corridos</li>
-                    <li>Avaliação física inclusa</li>
-                    <li>Economia garantida</li>
-                </ul>
-                <a href="#" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
-            </div>
-
-            <!-- PLANO SEMESTRAL -->
-            <div class="plan-card featured">
+            @foreach($planosDisponiveis as $plano)
+            <div class="plan-card @if($plano->featured) featured @endif">
+                @if($plano->featured)
                 <div class="plan-badge">Melhor Custo-Benefício</div>
-                <div class="plan-name">Semestral</div>
-                <div class="plan-price">R$ 539<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-top: 0.3rem;">Equivale a R$ 89,98/mês</p>
+                @endif
+                <div class="plan-name">{{ $plano->tipo }}</div>
+                <div class="plan-price">R$ {{ number_format($plano->valor, 0, '', '') }}<span>,{{ sprintf('%02d', ($plano->valor * 100) % 100) }}</span></div>
+                <p style="font-size: 0.85rem; color: @if($plano->featured) rgba(255,255,255,0.8) @else var(--gold) @endif; margin-top: 0.3rem;">{{ $plano->descricao }}</p>
                 
                 <div class="plan-divider"></div>
                 <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso a todas as áreas (Geral)</li>
-                    <li>Válido por 6 meses corridos</li>
-                    <li>2 avaliações físicas completas</li>
-                    <li>Suporte com instrutor de elite</li>
-                    <li>Brinde: Coqueteleira Coliseu</li>
+                    @foreach($plano->beneficios as $beneficio)
+                    <li>{{ $beneficio }}</li>
+                    @endforeach
                 </ul>
-                <a href="#" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
+                <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
             </div>
-
-            <!-- PLANO ANUAL -->
-            <div class="plan-card">
-                <div class="plan-name">Anual</div>
-                <div class="plan-price">R$ 959<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: var(--white-60); margin-top: 0.3rem;">Equivale a R$ 79,99/mês</p>
-                
-                <div class="plan-divider"></div>
-                <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso total 365 dias no ano</li>
-                    <li>Válido por 12 meses corridos</li>
-                    <li>Avaliações físicas bimestrais</li>
-                    <li>Acesso prioritário a eventos</li>
-                    <li>Maior desconto da casa</li>
-                </ul>
-                <a href="#" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
-            </div>
+            @endforeach
 
         </div>
     </main>

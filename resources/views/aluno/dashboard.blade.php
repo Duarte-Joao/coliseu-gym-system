@@ -322,23 +322,64 @@
         <h1>Fichas de Treino</h1>
         <p>Suas prescrições ativas para o período atual.</p>
       </div>
-      <div class="treino-card">
-        <div class="tc-left">
-          <span class="tc-tag">Ficha A</span>
-          <h3>Membros Superiores — Hipertrofia</h3>
-          <p>Iniciou em 10/05/2026 · Expira em 10/08/2026</p>
-          <div class="obs"><i class="ti ti-alert-circle" style="font-size:14px"></i> Focar na cadência e controle de carga no supino.</div>
+
+      @if(isset($treinos) && $treinos->isNotEmpty())
+        @foreach($treinos as $index => $atribuicao)
+          <div class="treino-card">
+            <div class="tc-left">
+              <span class="tc-tag">Ficha {{ $index + 1 }}</span>
+              <h3>{{ $atribuicao->treino->nome }}</h3>
+              <p>Iniciou em {{ $atribuicao->data_inicio?->format('d/m/Y') }} · Fim {{ $atribuicao->data_fim?->format('d/m/Y') ?? 'Indefinido' }}</p>
+              @if($atribuicao->descricao)
+                <div class="obs"><i class="ti ti-alert-circle" style="font-size:14px"></i> {{ $atribuicao->descricao }}</div>
+              @endif
+            </div>
+            <button class="btn" type="button" onclick="toggleTreinoDetalhes({{ $index }})"><i class="ti ti-eye"></i> Detalhes</button>
+          </div>
+
+          <div id="treino-detalhes-{{ $index }}" class="tbl-wrap" style="display:none;margin-bottom:1rem;">
+            <div class="tbl-head"><h3>Exercícios da Ficha {{ $index + 1 }}</h3></div>
+            <div style="padding:1rem;">
+              @foreach($atribuicao->treino->exercicios as $exercicio)
+                <div class="ex-row" style="grid-template-columns:1.5fr 0.9fr 0.9fr;">
+                  <div class="ex-n"><span class="ex-dot"></span>{{ $exercicio['nome'] }}</div>
+                  <div class="ex-s">{{ $exercicio['series'] }}x{{ $exercicio['repeticoes'] }}</div>
+                  <div class="ex-c">{{ $exercicio['carga'] }} kg</div>
+                </div>
+                <div class="detail-card" style="margin-bottom:1rem;">
+                  <div class="detail-grid" style="grid-template-columns:1fr 1fr; gap:1rem;">
+                    <div class="detail-item" style="grid-column:span 2;">
+                      <label>Observações do exercício</label>
+                      <span>{{ $exercicio['obs'] ?? 'Nenhuma descrição adicional.' }}</span>
+                    </div>
+                    <div style="min-width:220px;">
+                      @if(!empty($exercicio['imagem']) && \Illuminate\Support\Facades\Storage::disk('public')->exists($exercicio['imagem']))
+                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($exercicio['imagem']) }}" alt="{{ $exercicio['nome'] }}" style="width:100%;border-radius:12px;display:block;">
+                      @else
+                        <div style="padding:1rem;border:1px dashed rgba(255,255,255,0.2);border-radius:12px;color:var(--muted);text-align:center;">
+                          Sem imagem disponível
+                        </div>
+                      @endif
+                    </div>
+                  </div>
+                </div>
+              @endforeach
+            </div>
+          </div>
+        @endforeach
+      @else
+        <div class="tbl-wrap">
+          <div class="empty"><i class="ti ti-barbell"></i> Nenhuma ficha de treino atribuída para você ainda.</div>
         </div>
-        <button class="btn" onclick="openTreino('A','Membros Superiores — Hipertrofia')"><i class="ti ti-list-details"></i> Visualizar</button>
-      </div>
-      <div class="treino-card">
-        <div class="tc-left">
-          <span class="tc-tag">Ficha B</span>
-          <h3>Membros Inferiores &amp; Core</h3>
-          <p>Iniciou em 10/05/2026 · Expira em 10/08/2026</p>
-        </div>
-        <button class="btn" onclick="openTreino('B','Membros Inferiores &amp; Core')"><i class="ti ti-list-details"></i> Visualizar</button>
-      </div>
+      @endif
+
+      <script>
+        function toggleTreinoDetalhes(index) {
+          const detail = document.getElementById('treino-detalhes-' + index);
+          if (!detail) return;
+          detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
+        }
+      </script>
     </section>
 
     <!-- AULAS -->

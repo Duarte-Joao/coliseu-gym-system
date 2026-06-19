@@ -193,10 +193,13 @@
     <div class="sb-footer">
       <div class="nav-sep"></div>
       <div class="user-pill">
-        <div class="avatar">IN</div>
-        <div class="user-info"><strong>Instrutor</strong><small>Musculação · Turno Noite</small></div>
+        <div class="avatar">{{ Auth::user()->initials() }}</div>
+        <div class="user-info"><strong>{{ Auth::user()->name }}</strong><small>{{ optional($instrutorData)->especialidade ?? 'Instrutor' }} · {{ optional($instrutorData)->turno ?? 'Indisponível' }}</small></div>
       </div>
-      <a href="/login" class="logout"><i class="ti ti-door-exit"></i> Sair do Sistema</a>
+      <form action="{{ route('logout') }}" method="POST" style="margin: 0; padding: 0;">
+        @csrf
+        <button type="submit" class="logout"><i class="ti ti-door-exit"></i> Sair do Sistema</button>
+      </form>
     </div>
   </aside>
 
@@ -213,23 +216,23 @@
       <div class="stats">
         <div class="stat">
           <label>Especialidade</label>
-          <div class="val purple-c">Musculação</div>
+          <div class="val purple-c">{{ optional($instrutorData)->especialidade ?? 'Não definida' }}</div>
           <sub>Principal</sub>
         </div>
         <div class="stat gold">
           <label>Carga Horária</label>
-          <div class="val gold-c">8h / dia</div>
+          <div class="val gold-c">{{ optional($instrutorData)->carga_hora ?? '0' }}h / dia</div>
           <sub>Turno completo</sub>
         </div>
         <div class="stat amber">
           <label>Turno</label>
-          <div class="val amber-c">Noite</div>
+          <div class="val amber-c">{{ optional($instrutorData)->turno ?? 'Indefinido' }}</div>
           <sub>Designado</sub>
         </div>
         <div class="stat">
-          <label>Alunos sob tutela</label>
-          <div class="val purple-c" id="stat-qtd-alunos">0</div>
-          <sub id="stat-sub-pendencia">0 sem ficha ativa</sub>
+          <label>Fichas de Treino</label>
+          <div class="val purple-c" id="stat-qtd-treinos">{{ $treinos ? count($treinos) : 0 }}</div>
+          <sub>Prescrições ativas</sub>
         </div>
       </div>
 

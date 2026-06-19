@@ -7,7 +7,7 @@
 </div>
 
 <div class="form-card">
-  <form method="POST" action="{{ route('treinos.store') }}">
+  <form method="POST" action="{{ route('treinos.store') }}" enctype="multipart/form-data">
     @csrf
     <div class="form-grid">
       <div class="fg">
@@ -48,7 +48,7 @@
 @push('scripts')
 <script>
 let idx = 0;
-function addExercicio(nome='', series=3, reps=10, carga=0) {
+function addExercicio(nome='', series=3, reps=10, carga=0, imagemPath='') {
   const row = document.createElement('div');
   row.className = 'ex-row';
   row.innerHTML = `
@@ -60,6 +60,8 @@ function addExercicio(nome='', series=3, reps=10, carga=0) {
       <input type="number" name="exercicios[${idx}][repeticoes]" min="1" value="${reps}" required></div>
     <div class="fg"><label>Carga (kg)</label>
       <input type="number" name="exercicios[${idx}][carga]" min="0" step="0.5" value="${carga}" required></div>
+    <div class="fg span2"><label>Imagem do exercício</label>
+      <input type="file" name="exercicios[${idx}][imagem]" accept="image/*"></div>
     <button type="button" class="ex-remove" onclick="this.parentElement.remove()"><i class="ti ti-x"></i></button>`;
   document.getElementById('ex-list').appendChild(row);
   idx++;
