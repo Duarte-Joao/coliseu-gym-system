@@ -86,4 +86,3 @@ Route::middleware('auth')->group(function () {
         ->parameters(['pagamento-plano-alunos' => 'pagamento']);
 });
 
-require __DIR__.'/settings.php';
