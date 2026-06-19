@@ -2,8 +2,17 @@
 
 use Illuminate\Support\Facades\Route;
 use Illuminate\Http\Request;
+use App\Http\Controllers\InstrutorDashboardController;
+use App\Http\Controllers\UserController;
+use App\Http\Controllers\InstrutorController;
+use App\Http\Controllers\TreinoController;
+use App\Http\Controllers\TreinoAlunoController;
+use App\Http\Controllers\AulaColetivaController;
+use App\Http\Controllers\ReservaAulaColetivaController;
+use App\Http\Controllers\PlanoAlunoController;
+use App\Http\Controllers\PagamentoPlanoAlunoController;
 
-// ROTAS PÚBLICAS
+// ── PÁGINAS PÚBLICAS ────────────────────────────────────────
 Route::view('/', 'welcome')->name('home');
 Route::view('/planos', 'planos')->name('planos');
 
@@ -11,45 +20,41 @@ Route::any('/contato', function () {
     return view('contato');
 })->name('contato');
 
+// ── LOGIN ───────────────────────────────────────────────────
 Route::get('/login', function () {
     return view('login');
 })->name('login');
 
-
-// 🔀 REDIRECIONAMENTO INTELIGENTE (Separa Aluno e Instrutor pelos dados digitados)
-Route::post('/login', function (Request $request) { 
-    // Junta todos os valores preenchidos no formulário para varredura
+Route::post('/login', function (Request $request) {
     $dadosFormulario = implode(' ', $request->all());
 
-    // Se o usuário digitou a palavra 'instrutor' no e-mail ou login, vai para o Instrutor
     if (str_contains(strtolower($dadosFormulario), 'instrutor')) {
         return redirect()->route('dashboard.instrutor');
     }
 
-    // Caso contrário, vai para o painel do aluno padrão
     return redirect()->route('dashboard.aluno');
 })->name('login.post');
 
-Route::post('/cadastro', function () { 
+Route::post('/cadastro', function () {
     return redirect()->route('dashboard.aluno');
 })->name('register.post');
 
-
-// 🏠 PAINEL DO ALUNO (Visualização Livre para Testes)
+// ── DASHBOARDS ──────────────────────────────────────────────
 Route::get('/dashboard-aluno', function () {
     return view('aluno.dashboard');
 })->name('dashboard.aluno');
 
+Route::get('/dashboard-instrutor', InstrutorDashboardController::class)
+    ->name('dashboard.instrutor');
 
-// 🏋️‍♂️ PAINEL DO INSTRUTOR (Visualização Livre para Testes)
-Route::get('/dashboard-instrutor', function () {
-    return view('instrutor.dashboard');
-})->name('dashboard.instrutor');
-
-
-// ROTAS PROTEGIDAS (Middleware do Laravel)
-Route::middleware(['auth', 'verified'])->group(function () {
-    Route::view('dashboard', 'dashboard')->name('dashboard');
-});
+// ── RECURSOS (CRUD completo de cada módulo) ─────────────────
+Route::resource('usuarios',               UserController::class);
+Route::resource('instrutores',            InstrutorController::class);
+Route::resource('treinos',                TreinoController::class);
+Route::resource('treino-alunos',          TreinoAlunoController::class);
+Route::resource('aulas-coletivas',        AulaColetivaController::class);
+Route::resource('reserva-aulas-coletivas', ReservaAulaColetivaController::class);
+Route::resource('plano-alunos',           PlanoAlunoController::class);
+Route::resource('pagamento-plano-alunos', PagamentoPlanoAlunoController::class);
 
 require __DIR__.'/settings.php';
