@@ -1,8 +1,7 @@
 @extends('layouts.gym')
 @section('title', $instrutor->usuario->name ?? 'Instrutor')
 @section('content')
-<div class="pg-header">
-  <div><h1>{{ $instrutor->usuario->name ?? 'Instrutor' }}</h1><p>Perfil do instrutor</p></div>
+<x-page-header :title="$instrutor->usuario->name ?? 'Instrutor'" subtitle="Perfil do instrutor">
   <div class="actions">
     <a href="{{ route('instrutores.edit', $instrutor) }}" class="btn ghost"><i class="ti ti-pencil"></i> Editar</a>
     <form method="POST" action="{{ route('instrutores.destroy', $instrutor) }}" onsubmit="return confirm('Excluir este instrutor?')">
@@ -11,7 +10,7 @@
     </form>
     <a href="{{ route('instrutores.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
   </div>
-</div>
+</x-page-header>
 
 <div class="detail-card">
   <div class="detail-header"><h2>{{ $instrutor->usuario->name ?? '—' }}</h2></div>

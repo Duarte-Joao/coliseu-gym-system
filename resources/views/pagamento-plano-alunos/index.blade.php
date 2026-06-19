@@ -1,12 +1,25 @@
 @extends('layouts.gym')
 @section('title', 'Pagamentos')
 @section('content')
-<div class="pg-header">
-  <div><h1>Pagamentos</h1><p>Registros de pagamentos de planos</p></div>
+<x-page-header title="Pagamentos" subtitle="Registros de pagamentos de planos">
+  <a href="{{ route('pagamento-plano-alunos.pdf', request()->query()) }}" class="btn ghost" target="_blank"><i class="ti ti-file-type-pdf"></i> Exportar PDF</a>
   <a href="{{ route('pagamento-plano-alunos.create') }}" class="btn"><i class="ti ti-plus"></i> Registrar Pagamento</a>
-</div>
+</x-page-header>
 
 <form class="filter-bar" method="GET">
+  <div class="fg" style="flex:2;min-width:200px">
+    <label>Buscar aluno</label>
+    <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Nome do aluno...">
+  </div>
+  <div class="fg">
+    <label>Método</label>
+    <select name="tipo">
+      <option value="">Todos</option>
+      @foreach(['Pix','Cartão de Crédito','Cartão de Débito','Dinheiro','Boleto'] as $m)
+        <option value="{{ $m }}" {{ request('tipo') === $m ? 'selected' : '' }}>{{ $m }}</option>
+      @endforeach
+    </select>
+  </div>
   <div class="fg">
     <label>Status</label>
     <select name="status">
@@ -32,7 +45,7 @@
     <tr>
       <td>{{ $pag->plano->aluno->name ?? '—' }}</td>
       <td>{{ $pag->plano->tipo ?? '—' }}</td>
-      <td>{{ $pag->metodo_pagamento }}</td>
+      <td>{{ $pag->tipo }}</td>
       <td>{{ $pag->data?->format('d/m/Y') }}</td>
       <td><span class="badge {{ $pag->status === 'pago' ? 'b-ok' : ($pag->status === 'cancelado' ? 'b-err' : 'b-warn') }}">{{ $pag->status }}</span></td>
       <td>

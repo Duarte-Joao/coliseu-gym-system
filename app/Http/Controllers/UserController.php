@@ -19,6 +19,11 @@ class UserController extends Controller
     {
         $query = User::query();
 
+        if ($request->filled('busca')) {
+            $query->where(fn($q) => $q
+                ->where('name', 'like', "%{$request->busca}%")
+                ->orWhere('email', 'like', "%{$request->busca}%"));
+        }
         if ($request->filled('tipo')) {
             $query->where('tipo', $request->tipo);
         }
@@ -42,7 +47,7 @@ class UserController extends Controller
             'name'            => 'required|string|max:255',
             'email'           => 'required|string|email|max:255|unique:users',
             'password'        => 'required|string|min:8',
-            'cpf'             => 'required|string|size:14|unique:users',
+            'rg'              => 'required|string|max:20|unique:users',
             'data_nascimento' => 'required|date',
             'rua'             => 'required|string|max:255',
             'numero_rua'      => 'required|integer',
@@ -72,7 +77,7 @@ class UserController extends Controller
             TreinoAluno::create([
                 'usuario_id'  => $user->id,
                 'treino_id'   => $request->treino_id,
-                'data_inicio' => now()->toDateString(),
+                'validade' => now()->addYear()->toDateString(),
             ]);
         }
 
@@ -96,7 +101,7 @@ class UserController extends Controller
         $validated = $request->validate([
             'name'            => 'required|string|max:255',
             'email'           => ['required', 'string', 'email', 'max:255', Rule::unique('users')->ignore($usuario->id)],
-            'cpf'             => ['required', 'string', 'size:14', Rule::unique('users')->ignore($usuario->id)],
+            'rg'              => ['required', 'string', 'max:20', Rule::unique('users')->ignore($usuario->id)],
             'data_nascimento' => 'required|date',
             'rua'             => 'required|string|max:255',
             'numero_rua'      => 'required|integer',

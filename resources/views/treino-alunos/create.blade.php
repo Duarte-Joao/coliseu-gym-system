@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Atribuir Treino')
 @section('content')
-<div class="pg-header">
-  <div><h1>Atribuir Treino a Aluno</h1></div>
+<x-page-header title="Atribuir Treino a Aluno">
   <a href="{{ route('treino-alunos.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 <div class="form-card">
   <form method="POST" action="{{ route('treino-alunos.store') }}">
     @csrf
@@ -29,8 +28,7 @@
           @endforeach
         </select>
       </div>
-      <div class="fg"><label>Data de Início *</label><input type="date" name="data_inicio" value="{{ old('data_inicio', date('Y-m-d')) }}" required></div>
-      <div class="fg"><label>Data de Fim</label><input type="date" name="data_fim" value="{{ old('data_fim') }}"></div>
+      <div class="fg"><label>Validade</label><input type="date" name="validade" value="{{ old('validade', date('Y-m-d', strtotime('+1 year'))) }}"></div>
       <div class="fg span2"><label>Descrição</label><input type="text" name="descricao" value="{{ old('descricao') }}" placeholder="Observações sobre a atribuição..."></div>
     </div>
     <div class="form-actions">

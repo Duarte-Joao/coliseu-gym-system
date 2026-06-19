@@ -1,15 +1,21 @@
 @extends('layouts.gym')
 @section('title', 'Novo Treino')
 @section('content')
-<div class="pg-header">
-  <div><h1>Novo Treino</h1><p>Preencha os dados do template de treino</p></div>
+<x-page-header title="Novo Treino" subtitle="Preencha os dados do template de treino">
   <a href="{{ route('treinos.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 
 <div class="form-card">
   <form method="POST" action="{{ route('treinos.store') }}">
     @csrf
     <div class="form-grid">
+      @if($meuInstrutor)
+        <input type="hidden" name="instrutor_id" value="{{ $meuInstrutor->id }}">
+        <div class="fg">
+          <label>Instrutor</label>
+          <input type="text" value="{{ auth()->user()->name }}" disabled>
+        </div>
+      @else
       <div class="fg">
         <label>Instrutor *</label>
         <select name="instrutor_id" required>
@@ -19,13 +25,14 @@
           @endforeach
         </select>
       </div>
+      @endif
       <div class="fg">
         <label>Nome do Treino *</label>
         <input type="text" name="nome" value="{{ old('nome') }}" placeholder="Ex: Treino A - Peito e Tríceps" required>
       </div>
       <div class="fg span2">
-        <label>Observações</label>
-        <textarea name="obs" placeholder="Observações gerais sobre o treino...">{{ old('obs') }}</textarea>
+        <label>Descrição</label>
+        <textarea name="descricao" placeholder="Descrição geral sobre o treino...">{{ old('descricao') }}</textarea>
       </div>
     </div>
 

@@ -6,9 +6,11 @@ namespace App\Http\Controllers;
 
 use App\Models\PlanoAluno;
 use App\Models\User;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
 use Illuminate\Validation\Rule;
 
 class PlanoAlunoController extends Controller
@@ -17,8 +19,8 @@ class PlanoAlunoController extends Controller
     {
         $query = PlanoAluno::query()->with(['aluno', 'pagamentos']);
 
-        if ($request->filled('usuario_id')) {
-            $query->where('usuario_id', $request->usuario_id);
+        if ($request->filled('busca')) {
+            $query->whereHas('aluno', fn($q) => $q->where('name', 'like', "%{$request->busca}%"));
         }
         if ($request->filled('tipo')) {
             $query->where('tipo', $request->tipo);
@@ -56,6 +58,17 @@ class PlanoAlunoController extends Controller
         return view('plano-alunos.show', [
             'plano' => $plano->load(['aluno', 'pagamentos']),
         ]);
+    }
+
+    public function pdf(PlanoAluno $plano): Response
+    {
+        $plano->load(['aluno', 'pagamentos']);
+
+        $pdf = Pdf::loadView('pdf.plano', compact('plano'))
+            ->setPaper('a4', 'portrait');
+
+        $nome = str_replace(' ', '-', strtolower($plano->aluno->name ?? 'plano'));
+        return $pdf->stream("plano-{$nome}.pdf");
     }
 
     public function edit(PlanoAluno $plano): View

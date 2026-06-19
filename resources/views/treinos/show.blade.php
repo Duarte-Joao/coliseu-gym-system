@@ -1,9 +1,9 @@
 @extends('layouts.gym')
 @section('title', $treino->nome)
 @section('content')
-<div class="pg-header">
-  <div><h1>{{ $treino->nome }}</h1><p>Detalhes do treino</p></div>
+<x-page-header :title="$treino->nome" subtitle="Detalhes do treino">
   <div class="actions">
+    <a href="{{ route('treinos.pdf', $treino) }}" class="btn ghost" target="_blank"><i class="ti ti-file-type-pdf"></i> Imprimir</a>
     <a href="{{ route('treinos.edit', $treino) }}" class="btn ghost"><i class="ti ti-pencil"></i> Editar</a>
     <form method="POST" action="{{ route('treinos.destroy', $treino) }}" onsubmit="return confirm('Excluir este treino?')">
       @csrf @method('DELETE')
@@ -11,15 +11,15 @@
     </form>
     <a href="{{ route('treinos.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
   </div>
-</div>
+</x-page-header>
 
 <div class="detail-card">
   <div class="detail-header"><h2>{{ $treino->nome }}</h2></div>
   <div class="detail-grid">
     <div class="detail-item"><label>Instrutor</label><span>{{ $treino->instrutor->usuario->name ?? '—' }}</span></div>
     <div class="detail-item"><label>Criado em</label><span>{{ $treino->created_at->format('d/m/Y') }}</span></div>
-    @if($treino->obs)
-    <div class="detail-item" style="grid-column:span 2"><label>Observações</label><span>{{ $treino->obs }}</span></div>
+    @if($treino->descricao)
+    <div class="detail-item" style="grid-column:span 2"><label>Descrição</label><span>{{ $treino->descricao }}</span></div>
     @endif
   </div>
 </div>
@@ -55,13 +55,12 @@
     <div class="empty"><i class="ti ti-users"></i>Nenhum aluno com este treino</div>
   @else
   <table>
-    <thead><tr><th>Aluno</th><th>Início</th><th>Fim</th><th>Descrição</th></tr></thead>
+    <thead><tr><th>Aluno</th><th>Validade</th><th>Descrição</th></tr></thead>
     <tbody>
     @foreach($treino->treinoAlunos as $ta)
     <tr>
       <td>{{ $ta->aluno->name ?? '—' }}</td>
-      <td>{{ $ta->data_inicio?->format('d/m/Y') }}</td>
-      <td>{{ $ta->data_fim?->format('d/m/Y') ?? '—' }}</td>
+      <td>{{ $ta->validade?->format('d/m/Y') ?? '—' }}</td>
       <td>{{ $ta->descricao ?? '—' }}</td>
     </tr>
     @endforeach

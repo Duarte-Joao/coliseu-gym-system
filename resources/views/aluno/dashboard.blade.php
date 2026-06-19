@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>Painel do Gladiador — Coliseu Gym</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -170,6 +171,23 @@
   .sch-card .sch-meta{font-size:0.8rem;color:var(--muted);margin-top:3px}
   .sch-card .sch-time{background:rgba(139,92,246,0.1);color:var(--p2);font-size:0.75rem;font-weight:600;padding:3px 10px;border-radius:4px;display:inline-block;margin-top:4px}
 
+  /* PAYMENT MODAL */
+  .pay-section{display:none}
+  .pay-qr-wrap{text-align:center;padding:0.5rem 0 1.25rem}
+  .pay-qr-wrap img{width:200px;height:200px;border-radius:12px;border:2px solid rgba(139,92,246,0.25)}
+  .pay-key-box{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:0.75rem 1rem;font-family:monospace;font-size:0.82rem;word-break:break-all;margin-bottom:1rem;color:var(--p2)}
+  .pay-copy-btn{width:100%;background:rgba(139,92,246,0.08);border:1px dashed rgba(139,92,246,0.3);color:var(--p2);border-radius:8px;padding:0.65rem;cursor:pointer;font-family:'Barlow',sans-serif;font-size:0.85rem;font-weight:600;display:flex;align-items:center;justify-content:center;gap:6px;transition:all 0.2s;margin-bottom:0.5rem}
+  .pay-copy-btn:hover{background:rgba(139,92,246,0.15);border-style:solid}
+  .pay-fg{display:flex;flex-direction:column;gap:5px;margin-bottom:1rem}
+  .pay-fg label{font-size:0.75rem;text-transform:uppercase;letter-spacing:1px;color:var(--muted);font-weight:600}
+  .pay-fg input{background:rgba(255,255,255,0.05);border:1px solid var(--border);border-radius:8px;color:var(--txt);padding:0.65rem 0.9rem;font-family:'Barlow',sans-serif;font-size:0.9rem;width:100%;outline:none;transition:border-color 0.2s}
+  .pay-fg input:focus{border-color:var(--p1)}
+  .pay-grid{display:grid;grid-template-columns:1fr 1fr;gap:1rem}
+  .pay-center{text-align:center;padding:1rem 0}
+  .pay-center i{font-size:3rem;display:block;margin-bottom:1rem}
+  .pay-ref{background:rgba(255,255,255,0.04);border:1px solid var(--border);border-radius:8px;padding:0.75rem;font-size:1.1rem;font-weight:700;font-family:monospace;letter-spacing:3px;margin:1rem 0;color:var(--gold2)}
+  .m-actions{display:flex;gap:0.75rem;justify-content:flex-end;margin-top:1.5rem;padding-top:1.25rem;border-top:1px solid var(--border)}
+
   /* RESPONSIVE */
   @media(max-width:768px){
     .lay{flex-direction:column;height:auto}
@@ -217,10 +235,7 @@
 
     <!-- INÍCIO -->
     <section class="sec active" id="sec-inicio">
-      <div class="pg-header">
-        <h1>Saudações, {{ explode(' ', auth()->user()->name)[0] }}!</h1>
-        <p>Acompanhe sua evolução, treinos e agendamentos para o combate de hoje.</p>
-      </div>
+      <x-page-header :title="'Saudações, ' . explode(' ', auth()->user()->name)[0] . '!'" subtitle="Acompanhe sua evolução, treinos e agendamentos para o combate de hoje." />
 
       <div class="stats">
         <div class="stat gold">
@@ -316,21 +331,17 @@
 
     <!-- TREINOS -->
     <section class="sec" id="sec-treinos">
-      <div class="pg-header">
-        <h1>Fichas de Treino</h1>
-        <p>Suas prescrições ativas para o período atual.</p>
-      </div>
+      <x-page-header title="Fichas de Treino" subtitle="Suas prescrições ativas para o período atual." />
       @forelse($usuario->treinoAlunos as $ta)
       <div class="treino-card">
         <div class="tc-left">
           <span class="tc-tag">Ficha {{ chr(64 + $loop->iteration) }}</span>
           <h3>{{ $ta->treino->nome ?? '—' }}</h3>
           <p>
-            Iniciou em {{ $ta->data_inicio?->format('d/m/Y') }}
-            {{ $ta->data_fim ? ' · Expira em '.$ta->data_fim->format('d/m/Y') : '' }}
+            {{ $ta->validade ? 'Válido até '.$ta->validade->format('d/m/Y') : 'Sem data de validade' }}
           </p>
-          @if($ta->treino->obs ?? false)
-            <div class="obs"><i class="ti ti-alert-circle" style="font-size:14px"></i> {{ $ta->treino->obs }}</div>
+          @if($ta->treino->descricao ?? false)
+            <div class="obs"><i class="ti ti-alert-circle" style="font-size:14px"></i> {{ $ta->treino->descricao }}</div>
           @endif
         </div>
         <button class="btn" onclick="openTreino({{ $ta->id }})"><i class="ti ti-list-details"></i> Visualizar</button>
@@ -344,10 +355,7 @@
 
     <!-- AULAS -->
     <section class="sec" id="sec-aulas">
-      <div class="pg-header">
-        <h1>Aulas Coletivas</h1>
-        <p>Suas reservas e histórico de participação.</p>
-      </div>
+      <x-page-header title="Aulas Coletivas" subtitle="Suas reservas e histórico de participação." />
       <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:1.25rem">
         <div class="sec-title" style="margin-bottom:0">Suas Reservas <span>{{ $reservas->count() }} ativas</span></div>
         <button class="btn gold-btn" onclick="openAgendar()"><i class="ti ti-calendar-plus"></i> Agendar Aula</button>
@@ -377,27 +385,24 @@
 
     <!-- FINANCEIRO -->
     <section class="sec" id="sec-financeiro">
-      <div class="pg-header">
-        <h1>Histórico Financeiro</h1>
-        <p>Todas as transações e faturas do seu plano.</p>
-      </div>
+      <x-page-header title="Histórico Financeiro" subtitle="Todas as transações e faturas do seu plano." />
       <div class="tbl-wrap">
         <div class="tbl-head">
           <h3>Faturas do plano {{ $planoAtivo->tipo ?? '—' }}</h3>
           @if($pagamentos->isNotEmpty())
             @php $ultPag = $pagamentos->first(); @endphp
-            <span style="font-size:0.8rem;color:{{ $ultPag->status === 'pago' ? 'var(--ok)' : 'var(--warn)' }}">
+            <span id="pay-indicator" style="font-size:0.8rem;color:{{ $ultPag->status === 'pago' ? 'var(--ok)' : 'var(--warn)' }}">
               ● {{ $ultPag->status === 'pago' ? 'Adimplente' : 'Pendente' }}
             </span>
           @endif
         </div>
         <table>
-          <thead><tr><th>Ref.</th><th>Método</th><th>Data</th><th>Valor</th><th>Status</th></tr></thead>
+          <thead><tr><th>Ref.</th><th>Método</th><th>Data</th><th>Valor</th><th>Status</th><th></th></tr></thead>
           <tbody>
             @forelse($pagamentos as $pag)
-            <tr>
+            <tr id="pag-row-{{ $pag->id }}">
               <td><strong>#{{ $pag->id }}</strong></td>
-              <td>{{ $pag->metodo_pagamento }}</td>
+              <td>{{ $pag->tipo }}</td>
               <td>{{ $pag->data?->format('d/m/Y') }}</td>
               <td style="font-weight:600;color:var(--gold2)">R$ {{ number_format($planoAtivo->valor ?? 0, 2, ',', '.') }}</td>
               <td>
@@ -405,9 +410,17 @@
                   {{ $pag->status }}
                 </span>
               </td>
+              <td>
+                @if($pag->status === 'pendente')
+                <button class="btn ok-btn" style="font-size:0.78rem;padding:0.4rem 0.85rem"
+                  onclick="openPagar({{ $pag->id }}, '{{ $pag->tipo }}')">
+                  <i class="ti ti-credit-card"></i> Pagar
+                </button>
+                @endif
+              </td>
             </tr>
             @empty
-            <tr class="empty-row"><td colspan="5">Nenhum pagamento registrado.</td></tr>
+            <tr class="empty-row"><td colspan="6">Nenhum pagamento registrado.</td></tr>
             @endforelse
           </tbody>
         </table>
@@ -465,20 +478,86 @@
   </div>
 </div>
 
+<!-- MODAL PAGAMENTO -->
+<div class="overlay" id="m-pagar" onclick="closeIf(event,'m-pagar')">
+  <div class="modal" style="max-width:460px">
+    <div class="m-head">
+      <h2 id="pay-title">Efetuar Pagamento</h2>
+      <button class="close" onclick="closeM('m-pagar')"><i class="ti ti-x"></i></button>
+    </div>
+    <div class="m-body">
+
+      <!-- PIX -->
+      <div class="pay-section" id="pay-pix">
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1.25rem;text-align:center">Escaneie o QR code ou copie a chave Pix</p>
+        <div class="pay-qr-wrap">
+          <img id="pay-qr" src="" alt="QR Code Pix">
+        </div>
+        <div class="pay-key-box">coliseu.gym@pix.com.br</div>
+        <button class="pay-copy-btn" id="btn-copy-pix" onclick="copiarTexto('coliseu.gym@pix.com.br', this)">
+          <i class="ti ti-copy"></i> Copiar chave Pix
+        </button>
+      </div>
+
+      <!-- CARTÃO -->
+      <div class="pay-section" id="pay-card">
+        <div class="pay-fg">
+          <label>Número do cartão</label>
+          <input type="text" id="cc-num" placeholder="0000 0000 0000 0000" maxlength="19" oninput="fmtCard(this)">
+        </div>
+        <div class="pay-fg">
+          <label>Nome no cartão</label>
+          <input type="text" id="cc-name" placeholder="NOME COMO NO CARTÃO" style="text-transform:uppercase">
+        </div>
+        <div class="pay-grid">
+          <div class="pay-fg">
+            <label>Validade</label>
+            <input type="text" id="cc-exp" placeholder="MM/AA" maxlength="5" oninput="fmtExp(this)">
+          </div>
+          <div class="pay-fg">
+            <label>CVV</label>
+            <input type="text" id="cc-cvv" placeholder="123" maxlength="4" inputmode="numeric">
+          </div>
+        </div>
+      </div>
+
+      <!-- DINHEIRO -->
+      <div class="pay-section" id="pay-dinheiro">
+        <div class="pay-center">
+          <i class="ti ti-cash" style="color:var(--ok)"></i>
+          <p style="font-size:0.95rem;margin-bottom:0">Dirija-se à <strong>recepção</strong> com o código:</p>
+          <div class="pay-ref" id="pay-ref-cod"></div>
+          <p style="font-size:0.8rem;color:var(--muted)">Apresente este código ao atendente para registrar seu pagamento.</p>
+        </div>
+      </div>
+
+      <!-- BOLETO -->
+      <div class="pay-section" id="pay-boleto">
+        <p style="font-size:0.85rem;color:var(--muted);margin-bottom:1rem">Copie o código e pague em qualquer banco ou app:</p>
+        <div class="pay-key-box" id="pay-boleto-cod" style="font-size:0.75rem;letter-spacing:1px"></div>
+        <button class="pay-copy-btn" id="btn-copy-boleto" onclick="copiarBoleto()">
+          <i class="ti ti-copy"></i> Copiar código do boleto
+        </button>
+      </div>
+
+      <div class="m-actions">
+        <button class="btn" style="background:rgba(255,255,255,0.06);color:var(--txt);border:1px solid var(--border)" onclick="closeM('m-pagar')">
+          <i class="ti ti-x"></i> Cancelar
+        </button>
+        <button class="btn ok-btn" id="btn-pagar" onclick="confirmarPagamento()">
+          <i class="ti ti-check"></i> <span id="btn-pagar-txt">Confirmar Pagamento</span>
+        </button>
+      </div>
+    </div>
+  </div>
+</div>
+
 <div class="peso-toast" id="peso-toast">Registro salvo com sucesso!</div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.1/chart.umd.js"></script>
 <script>
   /* FICHAS — dados vindos do servidor */
-  const FICHAS = @json($usuario->treinoAlunos->map(fn($ta) => [
-      'id'        => $ta->id,
-      'nome'      => $ta->treino->nome ?? '',
-      'exercicios'=> collect($ta->treino->exercicios ?? [])->map(fn($ex) => [
-          'nome' => $ex['nome']       ?? '',
-          's'    => ($ex['series']    ?? '') . 'x ' . ($ex['repeticoes'] ?? ''),
-          'c'    => ($ex['carga']     ?? '0') . 'kg',
-      ])->all(),
-  ])->values());
+  const FICHAS = @json($fichas);
 
   /* NAVEGAÇÃO */
   function go(id, btn) {
@@ -587,6 +666,107 @@
 
   document.getElementById('inp-mes').value = new Date().toISOString().slice(0,7);
   renderPeso();
+
+  /* ── PAGAMENTO ─────────────────────────────────────────── */
+  let _pagId = null;
+
+  function openPagar(id, metodo) {
+    _pagId = id;
+    document.querySelectorAll('.pay-section').forEach(s => s.style.display = 'none');
+
+    const titles = {
+      'Pix': 'Pagar com Pix',
+      'Cartão de Crédito': 'Pagar com Cartão de Crédito',
+      'Cartão de Débito': 'Pagar com Cartão de Débito',
+      'Dinheiro': 'Pagar com Dinheiro',
+      'Boleto': 'Pagar com Boleto',
+    };
+    document.getElementById('pay-title').textContent = titles[metodo] ?? 'Efetuar Pagamento';
+
+    if (metodo === 'Pix') {
+      const key = 'coliseu.gym@pix.com.br';
+      document.getElementById('pay-qr').src =
+        `https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=${encodeURIComponent(key)}&color=a78bfa&bgcolor=16161e&margin=10`;
+      document.getElementById('pay-pix').style.display = 'block';
+    } else if (metodo === 'Cartão de Crédito' || metodo === 'Cartão de Débito') {
+      ['cc-num','cc-name','cc-exp','cc-cvv'].forEach(i => document.getElementById(i).value = '');
+      document.getElementById('pay-card').style.display = 'block';
+    } else if (metodo === 'Dinheiro') {
+      document.getElementById('pay-ref-cod').textContent = 'PAG-' + String(id).padStart(6, '0');
+      document.getElementById('pay-dinheiro').style.display = 'block';
+    } else if (metodo === 'Boleto') {
+      const yr = new Date().getFullYear();
+      document.getElementById('pay-boleto-cod').textContent =
+        `23790.00001 60000.${String(id).padStart(6,'0')} 00000.000003 1 ${yr}0000${String(id).padStart(10,'0')}`;
+      document.getElementById('pay-boleto').style.display = 'block';
+    }
+
+    document.getElementById('m-pagar').classList.add('on');
+  }
+
+  async function confirmarPagamento() {
+    const btn = document.getElementById('btn-pagar');
+    const txt = document.getElementById('btn-pagar-txt');
+    btn.disabled = true;
+    txt.textContent = 'Processando...';
+
+    try {
+      const resp = await fetch(`/pagamento-plano-alunos/${_pagId}/pagar`, {
+        method: 'PATCH',
+        headers: {
+          'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+          'Accept': 'application/json',
+        },
+      });
+      if (!resp.ok) throw new Error();
+
+      closeM('m-pagar');
+
+      const row = document.getElementById('pag-row-' + _pagId);
+      if (row) {
+        const badge = row.querySelector('.badge');
+        badge.className = 'badge b-ok';
+        badge.textContent = 'pago';
+        const actionTd = row.cells[row.cells.length - 1];
+        actionTd.innerHTML = '';
+      }
+
+      const ind = document.getElementById('pay-indicator');
+      if (ind) { ind.style.color = 'var(--ok)'; ind.textContent = '● Adimplente'; }
+
+    } catch {
+      alert('Erro ao processar o pagamento. Tente novamente.');
+    } finally {
+      btn.disabled = false;
+      txt.textContent = 'Confirmar Pagamento';
+    }
+  }
+
+  function copiarTexto(val, btn) {
+    navigator.clipboard.writeText(val).then(() => {
+      const orig = btn.innerHTML;
+      btn.innerHTML = '<i class="ti ti-check"></i> Copiado!';
+      setTimeout(() => btn.innerHTML = orig, 2000);
+    });
+  }
+
+  function copiarBoleto() {
+    copiarTexto(
+      document.getElementById('pay-boleto-cod').textContent,
+      document.getElementById('btn-copy-boleto')
+    );
+  }
+
+  function fmtCard(input) {
+    const v = input.value.replace(/\D/g,'').slice(0,16);
+    input.value = v.match(/.{1,4}/g)?.join(' ') ?? v;
+  }
+
+  function fmtExp(input) {
+    let v = input.value.replace(/\D/g,'').slice(0,4);
+    if (v.length >= 3) v = v.slice(0,2) + '/' + v.slice(2);
+    input.value = v;
+  }
 </script>
 </body>
 </html>

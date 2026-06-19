@@ -45,8 +45,8 @@ class PlanoAlunoSeeder extends Seeder
                     'plano_aluno_id' => $plano->id,
                     'data' => $dataVencimento->format('Y-m-d'),
                     'status' => $status,
-                    'metodo_pagamento' => $status === 'pago' 
-                        ? fake()->randomElement(['Cartão de Crédito', 'Pix', 'Dinheiro']) 
+                    'tipo' => $status === 'pago'
+                        ? fake()->randomElement(['Cartão de Crédito', 'Pix', 'Dinheiro'])
                         : 'Boleto',
                 ]);
             }

@@ -6,9 +6,13 @@ namespace App\Http\Controllers;
 
 use App\Models\PagamentoPlanoAluno;
 use App\Models\PlanoAluno;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Http\Response;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Validation\Rule;
 
 class PagamentoPlanoAlunoController extends Controller
@@ -17,8 +21,11 @@ class PagamentoPlanoAlunoController extends Controller
     {
         $query = PagamentoPlanoAluno::query()->with('plano.aluno');
 
-        if ($request->filled('plano_aluno_id')) {
-            $query->where('plano_aluno_id', $request->plano_aluno_id);
+        if ($request->filled('busca')) {
+            $query->whereHas('plano.aluno', fn($q) => $q->where('name', 'like', "%{$request->busca}%"));
+        }
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
         }
         if ($request->filled('status')) {
             $query->where('status', $request->status);
@@ -27,6 +34,31 @@ class PagamentoPlanoAlunoController extends Controller
         $pagamentos = $query->paginate(15)->withQueryString();
 
         return view('pagamento-plano-alunos.index', compact('pagamentos'));
+    }
+
+    public function pdf(Request $request): Response
+    {
+        $query = PagamentoPlanoAluno::query()->with('plano.aluno');
+
+        if ($request->filled('busca')) {
+            $query->whereHas('plano.aluno', fn($q) => $q->where('name', 'like', "%{$request->busca}%"));
+        }
+        if ($request->filled('tipo')) {
+            $query->where('tipo', $request->tipo);
+        }
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
+        }
+
+        $pagamentos = $query->orderBy('data', 'desc')->get();
+        $busca  = $request->busca;
+        $tipo   = $request->tipo;
+        $status = $request->status;
+
+        $pdf = Pdf::loadView('pdf.pagamentos', compact('pagamentos', 'busca', 'tipo', 'status'))
+            ->setPaper('a4', 'portrait');
+
+        return $pdf->stream('relatorio-pagamentos-' . now()->format('Y-m-d') . '.pdf');
     }
 
     public function create(Request $request): View
@@ -43,7 +75,7 @@ class PagamentoPlanoAlunoController extends Controller
     {
         $validated = $request->validate([
             'plano_aluno_id'   => 'required|exists:plano_alunos,id',
-            'metodo_pagamento' => 'required|string|max:255',
+            'tipo' => ['required', Rule::in(['Pix', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro', 'Boleto'])],
             'data'             => 'required|date',
             'status'           => ['nullable', Rule::in(['pago', 'pendente', 'cancelado'])],
         ]);
@@ -66,7 +98,7 @@ class PagamentoPlanoAlunoController extends Controller
     public function update(Request $request, PagamentoPlanoAluno $pagamento): RedirectResponse
     {
         $validated = $request->validate([
-            'metodo_pagamento' => 'required|string|max:255',
+            'tipo' => ['required', Rule::in(['Pix', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro', 'Boleto'])],
             'data'             => 'required|date',
             'status'           => ['required', Rule::in(['pago', 'pendente', 'cancelado'])],
         ]);
@@ -74,6 +106,17 @@ class PagamentoPlanoAlunoController extends Controller
         $pagamento->update($validated);
 
         return redirect()->route('pagamento-plano-alunos.index')->with('success', 'Pagamento atualizado com sucesso!');
+    }
+
+    public function pagar(PagamentoPlanoAluno $pagamento): JsonResponse
+    {
+        if ($pagamento->plano->usuario_id !== Auth::id() || $pagamento->status !== 'pendente') {
+            abort(403);
+        }
+
+        $pagamento->update(['status' => 'pago']);
+
+        return response()->json(['ok' => true]);
     }
 
     public function destroy(PagamentoPlanoAluno $pagamento): RedirectResponse

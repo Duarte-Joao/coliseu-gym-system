@@ -53,7 +53,7 @@ class TreinoFactory extends Factory
                 'Treino Full Body - Resistência',
                 'Treino Funcional de Alta Intensidade'
             ]),
-            'obs' => fake()->optional(0.7)->sentence(),
+            'descricao' => fake()->optional(0.7)->sentence(),
             'exercicios' => fake()->randomElement($exerciciosDisponiveis),
         ];
     }

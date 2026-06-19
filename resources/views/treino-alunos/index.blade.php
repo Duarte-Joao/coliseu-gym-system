@@ -1,25 +1,39 @@
 @extends('layouts.gym')
 @section('title', 'Treinos dos Alunos')
 @section('content')
-<div class="pg-header">
-  <div><h1>Treinos dos Alunos</h1><p>Atribuições de treinos</p></div>
+<x-page-header title="Treinos dos Alunos" subtitle="Atribuições de treinos">
   <a href="{{ route('treino-alunos.create') }}" class="btn"><i class="ti ti-plus"></i> Atribuir Treino</a>
-</div>
+</x-page-header>
+
+<form class="filter-bar" method="GET">
+  <div class="fg" style="flex:2;min-width:200px">
+    <label>Buscar aluno</label>
+    <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Nome do aluno...">
+  </div>
+  <button type="submit" class="btn ghost"><i class="ti ti-search"></i> Filtrar</button>
+  <a href="{{ route('treino-alunos.index') }}" class="btn ghost"><i class="ti ti-x"></i></a>
+</form>
+
 <div class="tbl-wrap">
   <div class="tbl-head"><h3>{{ $atribuicoes->total() }} atribuição(ões)</h3></div>
   @if($atribuicoes->isEmpty())
-    <div class="empty"><i class="ti ti-clipboard-list"></i>Nenhuma atribuição cadastrada</div>
+    <div class="empty"><i class="ti ti-clipboard-list"></i>Nenhuma atribuição encontrada</div>
   @else
   <table>
-    <thead><tr><th>Aluno</th><th>Treino</th><th>Instrutor</th><th>Início</th><th>Fim</th><th></th></tr></thead>
+    <thead><tr>
+      <th>Aluno</th><th>Treino</th>
+      @if(!isset($meuInstrutor) || !$meuInstrutor)<th>Instrutor</th>@endif
+      <th>Validade</th><th></th>
+    </tr></thead>
     <tbody>
     @foreach($atribuicoes as $a)
     <tr>
       <td><strong>{{ $a->aluno->name ?? '—' }}</strong></td>
       <td>{{ $a->treino->nome ?? '—' }}</td>
-      <td>{{ $a->treino->instrutor->usuario->name ?? '—' }}</td>
-      <td>{{ $a->data_inicio?->format('d/m/Y') }}</td>
-      <td>{{ $a->data_fim?->format('d/m/Y') ?? '—' }}</td>
+      @if(!isset($meuInstrutor) || !$meuInstrutor)
+        <td>{{ $a->treino->instrutor->usuario->name ?? '—' }}</td>
+      @endif
+      <td>{{ $a->validade?->format('d/m/Y') ?? '—' }}</td>
       <td>
         <div class="actions">
           <a href="{{ route('treino-alunos.edit', $a) }}" class="btn ghost btn-sm"><i class="ti ti-pencil"></i></a>

@@ -1,12 +1,15 @@
 @extends('layouts.gym')
 @section('title', 'Usuários')
 @section('content')
-<div class="pg-header">
-  <div><h1>Usuários</h1><p>Gerencie os usuários do sistema</p></div>
+<x-page-header title="Usuários" subtitle="Gerencie os usuários do sistema">
   <a href="{{ route('usuarios.create') }}" class="btn"><i class="ti ti-plus"></i> Novo Usuário</a>
-</div>
+</x-page-header>
 
 <form class="filter-bar" method="GET">
+  <div class="fg" style="flex:2;min-width:200px">
+    <label>Buscar</label>
+    <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Nome ou e-mail...">
+  </div>
   <div class="fg">
     <label>Tipo</label>
     <select name="tipo">
@@ -34,12 +37,12 @@
     <div class="empty"><i class="ti ti-users"></i>Nenhum usuário cadastrado</div>
   @else
   <table>
-    <thead><tr><th>Nome</th><th>CPF</th><th>Telefone</th><th>Tipo</th><th>Status</th><th></th></tr></thead>
+    <thead><tr><th>Nome</th><th>RG</th><th>Telefone</th><th>Tipo</th><th>Status</th><th></th></tr></thead>
     <tbody>
     @foreach($usuarios as $u)
     <tr>
       <td><strong>{{ $u->name }}</strong><span class="sub">{{ $u->email }}</span></td>
-      <td>{{ $u->cpf ?? '—' }}</td>
+      <td>{{ $u->rg ?? '—' }}</td>
       <td>{{ $u->numero_telefone ?? '—' }}</td>
       <td><span class="badge b-pur">{{ $u->tipo ?? '—' }}</span></td>
       <td><span class="badge {{ $u->status === 'ativo' ? 'b-ok' : 'b-err' }}">{{ $u->status ?? '—' }}</span></td>

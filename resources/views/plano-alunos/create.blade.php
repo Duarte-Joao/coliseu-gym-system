@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Novo Plano')
 @section('content')
-<div class="pg-header">
-  <div><h1>Novo Plano</h1><p>Contratar plano para um aluno</p></div>
+<x-page-header title="Novo Plano" subtitle="Contratar plano para um aluno">
   <a href="{{ route('plano-alunos.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 <div class="form-card">
   <form method="POST" action="{{ route('plano-alunos.store') }}">
     @csrf

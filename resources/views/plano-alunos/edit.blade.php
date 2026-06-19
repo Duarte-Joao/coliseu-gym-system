@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Editar Plano')
 @section('content')
-<div class="pg-header">
-  <div><h1>Editar Plano</h1><p>{{ $plano->aluno->name ?? '' }} — {{ $plano->tipo }}</p></div>
+<x-page-header title="Editar Plano" :subtitle="($plano->aluno->name ?? '') . ' — ' . $plano->tipo">
   <a href="{{ route('plano-alunos.show', $plano) }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 <div class="form-card">
   <form method="POST" action="{{ route('plano-alunos.update', $plano) }}">
     @csrf @method('PUT')

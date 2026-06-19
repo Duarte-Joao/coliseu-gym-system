@@ -22,7 +22,7 @@ class PagamentoPlanoAlunoFactory extends Factory
     {
         return [
             'plano_aluno_id' => PlanoAluno::factory(),
-            'metodo_pagamento' => fake()->randomElement(['Cartão de Crédito', 'Pix', 'Dinheiro', 'Boleto']),
+            'tipo' => fake()->randomElement(['Cartão de Crédito', 'Pix', 'Dinheiro', 'Boleto']),
             'data' => fake()->dateTimeBetween('-4 months', 'now')->format('Y-m-d'),
             'status' => fake()->randomElement(['pago', 'pago', 'pago', 'pendente', 'cancelado']), // Maior probabilidade de estar pago
         ];

@@ -43,6 +43,16 @@ class AlunoDashboardController extends Controller
             ->filter(fn($r) => $r->aula?->datahora?->isCurrentMonth())
             ->count();
 
+        $fichas = $usuario->treinoAlunos->map(fn ($ta) => [
+            'id'        => $ta->id,
+            'nome'      => $ta->treino->nome ?? '',
+            'exercicios' => collect($ta->treino->exercicios ?? [])->map(fn ($ex) => [
+                'nome' => $ex['nome']       ?? '',
+                's'    => ($ex['series']    ?? '') . 'x ' . ($ex['repeticoes'] ?? ''),
+                'c'    => ($ex['carga']     ?? '0') . 'kg',
+            ])->values()->all(),
+        ])->values();
+
         return view('aluno.dashboard', [
             'usuario'          => $usuario,
             'planoAtivo'       => $planoAtivo,
@@ -50,6 +60,7 @@ class AlunoDashboardController extends Controller
             'aulasDisponiveis' => $aulasDisponiveis,
             'pagamentos'       => $pagamentos,
             'aulasEsseMes'     => $aulasEsseMes,
+            'fichas'           => $fichas,
         ]);
     }
 }

@@ -3,6 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="csrf-token" content="{{ csrf_token() }}">
 <title>@yield('title', 'Coliseu Gym')</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,17 +14,22 @@
   body{background:var(--dark);color:var(--txt);font-family:'Barlow',sans-serif;display:flex;min-height:100vh}
   .lay{display:flex;width:100%;min-height:100vh}
   .sb{width:240px;background:var(--sidebar);border-right:1px solid var(--border);display:flex;flex-direction:column;padding:1.5rem 0.75rem;flex-shrink:0;position:sticky;top:0;height:100vh;overflow-y:auto}
-  .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;padding:0 0.5rem 2rem;letter-spacing:2px;text-decoration:none;color:var(--txt);display:block}
+  .logo{font-family:'Bebas Neue',sans-serif;font-size:2rem;padding:0 0.5rem 1.75rem;letter-spacing:2px;text-decoration:none;color:var(--txt);display:block}
   .logo span{color:var(--p1)}
   .logo small{display:block;font-size:0.5rem;letter-spacing:4px;color:var(--muted);font-family:'Barlow',sans-serif;font-weight:500;margin-top:-4px}
-  .nav{display:flex;flex-direction:column;gap:4px}
-  .nav-link{color:var(--muted);padding:0.75rem 0.85rem;font-family:'Barlow',sans-serif;font-size:0.9rem;font-weight:500;border-radius:8px;display:flex;align-items:center;gap:0.7rem;transition:all 0.2s;text-decoration:none}
+  .nav{display:flex;flex-direction:column;gap:2px}
+  .nav-label{font-size:0.62rem;font-weight:700;text-transform:uppercase;letter-spacing:2px;color:var(--muted);padding:0.6rem 0.85rem 0.2rem;display:block;opacity:0.5}
+  .nav-link{color:var(--muted);padding:0.6rem 0.85rem;font-family:'Barlow',sans-serif;font-size:0.875rem;font-weight:500;border-radius:8px;display:flex;align-items:center;gap:0.65rem;transition:all 0.2s;text-decoration:none}
   .nav-link:hover{background:rgba(139,92,246,0.08);color:var(--txt)}
   .nav-link.active{background:rgba(139,92,246,0.15);color:var(--p2);border-left:3px solid var(--p1);border-radius:0 8px 8px 0;padding-left:calc(0.85rem - 3px)}
-  .nav-link i{font-size:18px}
-  .nav-sep{height:1px;background:var(--border);margin:0.75rem 0}
+  .nav-link i{font-size:17px;flex-shrink:0}
+  .nav-sep{height:1px;background:var(--border);margin:0.5rem 0}
   .sb-footer{margin-top:auto;padding-top:1rem}
-  .logout-link{border:1px solid rgba(239,68,68,0.25);color:#f87171;padding:0.65rem;border-radius:8px;font-weight:600;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all 0.2s}
+  .user-pill{display:flex;align-items:center;gap:0.7rem;padding:0.7rem;border-radius:8px;background:rgba(255,255,255,0.03);margin-bottom:0.75rem}
+  .avatar{width:36px;height:36px;border-radius:50%;background:linear-gradient(135deg,var(--p3),var(--p1));display:flex;align-items:center;justify-content:center;font-weight:700;font-size:0.8rem;color:#fff;flex-shrink:0}
+  .user-info strong{font-size:0.875rem;display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;max-width:145px}
+  .user-info small{font-size:0.72rem;color:var(--muted);display:block}
+  .logout-link{background:transparent;border:1px solid rgba(239,68,68,0.25);color:#f87171;padding:0.65rem;border-radius:8px;font-weight:600;font-size:0.85rem;display:flex;align-items:center;justify-content:center;gap:8px;text-decoration:none;transition:all 0.2s;cursor:pointer;width:100%;font-family:'Barlow',sans-serif}
   .logout-link:hover{background:var(--err);color:#fff;border-color:var(--err)}
   .main{flex:1;overflow-y:auto;padding:2rem 2.5rem}
   .pg-header{margin-bottom:2rem;display:flex;justify-content:space-between;align-items:flex-start;flex-wrap:wrap;gap:1rem}
@@ -57,7 +63,7 @@
   .b-warn{background:var(--warn-bg);color:var(--warn)}
   .b-err{background:var(--err-bg);color:var(--err)}
   .b-pur{background:rgba(139,92,246,0.15);color:var(--p2)}
-  .form-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem;max-width:720px}
+  .form-card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:2rem}
   .form-grid{display:grid;grid-template-columns:1fr 1fr;gap:1.25rem}
   .fg{display:flex;flex-direction:column;gap:6px}
   .fg.span2{grid-column:span 2}
@@ -86,45 +92,105 @@
   .filter-bar label{font-size:0.72rem}
   .empty{padding:3rem;text-align:center;color:var(--muted)}
   .empty i{font-size:2.5rem;display:block;margin-bottom:0.75rem;opacity:0.4}
+  .pag-wrap{margin-top:1rem}
+  .pag-nav{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:0.75rem;padding:0.5rem 0}
+  .pag-info{font-size:0.8rem;color:var(--muted)}
+  .pag-links{display:flex;gap:4px;align-items:center;flex-wrap:wrap}
+  .pag-btn{display:inline-flex;align-items:center;justify-content:center;min-width:34px;height:34px;padding:0 8px;border-radius:8px;font-size:0.85rem;font-family:'Barlow',sans-serif;font-weight:600;color:var(--muted);background:var(--card);border:1px solid var(--border);text-decoration:none;transition:all 0.2s}
+  .pag-btn:hover:not(.disabled):not(.current):not(.dots){background:rgba(139,92,246,0.1);color:var(--txt);border-color:rgba(139,92,246,0.3)}
+  .pag-btn.current{background:var(--p1);color:#fff;border-color:var(--p1)}
+  .pag-btn.disabled{opacity:0.35;cursor:not-allowed}
+  .pag-btn.dots{background:transparent;border-color:transparent;cursor:default;color:var(--muted)}
 </style>
+@stack('styles')
 </head>
 <body>
 <div class="lay">
   <aside class="sb">
-    <a href="{{ route('home') }}" class="logo">COLISEU<span>GYM</span><small>MANAGEMENT</small></a>
+    @php $userTipo = auth()->user()?->tipo; @endphp
+    <a href="{{ $userTipo === 'instrutor' ? route('dashboard.treinador') : route('dashboard.admin') }}" class="logo">COLISEU<span>GYM</span><small>MANAGEMENT</small></a>
     <nav class="nav">
-      <a href="{{ route('treinos.index') }}" class="nav-link {{ request()->routeIs('treinos.*') ? 'active' : '' }}">
-        <i class="ti ti-barbell"></i> Treinos
-      </a>
-      <a href="{{ route('treino-alunos.index') }}" class="nav-link {{ request()->routeIs('treino-alunos.*') ? 'active' : '' }}">
-        <i class="ti ti-clipboard-list"></i> Treinos dos Alunos
-      </a>
-      <div class="nav-sep"></div>
-      <a href="{{ route('instrutores.index') }}" class="nav-link {{ request()->routeIs('instrutores.*') ? 'active' : '' }}">
-        <i class="ti ti-user-star"></i> Instrutores
-      </a>
-      <a href="{{ route('usuarios.index') }}" class="nav-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
-        <i class="ti ti-users"></i> Usuários
-      </a>
-      <div class="nav-sep"></div>
-      <a href="{{ route('plano-alunos.index') }}" class="nav-link {{ request()->routeIs('plano-alunos.*') ? 'active' : '' }}">
-        <i class="ti ti-id-badge-2"></i> Planos
-      </a>
-      <a href="{{ route('pagamento-plano-alunos.index') }}" class="nav-link {{ request()->routeIs('pagamento-plano-alunos.*') ? 'active' : '' }}">
-        <i class="ti ti-cash"></i> Pagamentos
-      </a>
-      <div class="nav-sep"></div>
-      <a href="{{ route('aulas-coletivas.index') }}" class="nav-link {{ request()->routeIs('aulas-coletivas.*') ? 'active' : '' }}">
-        <i class="ti ti-calendar-event"></i> Aulas Coletivas
-      </a>
-      <a href="{{ route('reserva-aulas-coletivas.index') }}" class="nav-link {{ request()->routeIs('reserva-aulas-coletivas.*') ? 'active' : '' }}">
-        <i class="ti ti-ticket"></i> Reservas
-      </a>
+      @if($userTipo === 'instrutor')
+        {{-- SIDEBAR DO TREINADOR --}}
+        <a href="{{ route('dashboard.treinador') }}" class="nav-link {{ request()->routeIs('dashboard.treinador') ? 'active' : '' }}">
+          <i class="ti ti-layout-dashboard"></i> Dashboard
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-label">Treinos</span>
+        <a href="{{ route('treinos.index') }}" class="nav-link {{ request()->routeIs('treinos.*') ? 'active' : '' }}">
+          <i class="ti ti-barbell"></i> Fichas
+        </a>
+        <a href="{{ route('treino-alunos.index') }}" class="nav-link {{ request()->routeIs('treino-alunos.*') ? 'active' : '' }}">
+          <i class="ti ti-clipboard-list"></i> Fichas dos Alunos
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-label">Aulas</span>
+        <a href="{{ route('aulas-coletivas.index') }}" class="nav-link {{ request()->routeIs('aulas-coletivas.*') ? 'active' : '' }}">
+          <i class="ti ti-calendar-event"></i> Aulas Coletivas
+        </a>
+        <div class="nav-sep"></div>
+        <a href="{{ route('treinador.alunos') }}" class="nav-link {{ request()->routeIs('treinador.alunos') ? 'active' : '' }}">
+          <i class="ti ti-users"></i> Meus Alunos
+        </a>
+        <div class="nav-sep"></div>
+        <a href="{{ route('treinador.perfil') }}" class="nav-link {{ request()->routeIs('treinador.perfil') ? 'active' : '' }}">
+          <i class="ti ti-user-circle"></i> Perfil
+        </a>
+      @else
+        {{-- SIDEBAR DO ADMIN --}}
+        <a href="{{ route('dashboard.admin') }}" class="nav-link {{ request()->routeIs('dashboard.admin') ? 'active' : '' }}">
+          <i class="ti ti-layout-dashboard"></i> Dashboard
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-label">Treinos</span>
+        <a href="{{ route('treinos.index') }}" class="nav-link {{ request()->routeIs('treinos.*') ? 'active' : '' }}">
+          <i class="ti ti-barbell"></i> Fichas
+        </a>
+        <a href="{{ route('treino-alunos.index') }}" class="nav-link {{ request()->routeIs('treino-alunos.*') ? 'active' : '' }}">
+          <i class="ti ti-clipboard-list"></i> Fichas dos Alunos
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-label">Usuários</span>
+        <a href="{{ route('usuarios.index') }}" class="nav-link {{ request()->routeIs('usuarios.*') ? 'active' : '' }}">
+          <i class="ti ti-users"></i> Alunos
+        </a>
+        <a href="{{ route('instrutores.index') }}" class="nav-link {{ request()->routeIs('instrutores.*') ? 'active' : '' }}">
+          <i class="ti ti-user-star"></i> Instrutores
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-label">Aulas</span>
+        <a href="{{ route('aulas-coletivas.index') }}" class="nav-link {{ request()->routeIs('aulas-coletivas.*') ? 'active' : '' }}">
+          <i class="ti ti-calendar-event"></i> Aulas Coletivas
+        </a>
+        <a href="{{ route('reserva-aulas-coletivas.index') }}" class="nav-link {{ request()->routeIs('reserva-aulas-coletivas.*') ? 'active' : '' }}">
+          <i class="ti ti-ticket"></i> Reservas
+        </a>
+        <div class="nav-sep"></div>
+        <span class="nav-label">Financeiro</span>
+        <a href="{{ route('plano-alunos.index') }}" class="nav-link {{ request()->routeIs('plano-alunos.*') ? 'active' : '' }}">
+          <i class="ti ti-id-badge-2"></i> Planos
+        </a>
+        <a href="{{ route('pagamento-plano-alunos.index') }}" class="nav-link {{ request()->routeIs('pagamento-plano-alunos.*') ? 'active' : '' }}">
+          <i class="ti ti-cash"></i> Pagamentos
+        </a>
+      @endif
     </nav>
     <div class="sb-footer">
-      <a href="{{ route('login') }}" class="logout-link">
-        <i class="ti ti-logout"></i> Sair
-      </a>
+      @auth
+      <div class="user-pill">
+        <div class="avatar">{{ strtoupper(substr(auth()->user()->name ?? '??', 0, 2)) }}</div>
+        <div class="user-info">
+          <strong>{{ auth()->user()->name }}</strong>
+          <small>{{ ucfirst(auth()->user()->tipo ?? 'Usuário') }}</small>
+        </div>
+      </div>
+      @endauth
+      <form method="POST" action="{{ route('logout') }}">
+        @csrf
+        <button type="submit" class="logout-link">
+          <i class="ti ti-door-exit"></i> Sair do Sistema
+        </button>
+      </form>
     </div>
   </aside>
   <main class="main">

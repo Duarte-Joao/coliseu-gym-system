@@ -9,7 +9,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\SoftDeletes;
 
-#[Fillable(['instrutor_id', 'nome', 'obs', 'exercicios'])]
+#[Fillable(['instrutor_id', 'nome', 'descricao', 'exercicios'])]
 class Treino extends Model
 {
     use HasFactory, SoftDeletes;

@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Novo Usuário')
 @section('content')
-<div class="pg-header">
-  <div><h1>Novo Usuário</h1><p>Cadastrar usuário pelo painel administrativo</p></div>
+<x-page-header title="Novo Usuário" subtitle="Cadastrar usuário pelo painel administrativo">
   <a href="{{ route('usuarios.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 
 <div class="form-card">
   <form method="POST" action="{{ route('usuarios.store') }}">
@@ -13,7 +12,7 @@
       <div class="fg span2"><label>Nome *</label><input type="text" name="name" value="{{ old('name') }}" required></div>
       <div class="fg"><label>E-mail *</label><input type="email" name="email" value="{{ old('email') }}" required></div>
       <div class="fg"><label>Senha *</label><input type="password" name="password" required></div>
-      <div class="fg"><label>CPF *</label><input type="text" name="cpf" value="{{ old('cpf') }}" placeholder="000.000.000-00" required></div>
+      <div class="fg"><label>RG *</label><input type="text" name="rg" value="{{ old('rg') }}" placeholder="00.000.000-0" required></div>
       <div class="fg"><label>Data de Nascimento *</label><input type="date" name="data_nascimento" value="{{ old('data_nascimento') }}" required></div>
       <div class="fg"><label>Telefone *</label><input type="text" name="numero_telefone" value="{{ old('numero_telefone') }}" placeholder="(49) 99999-9999" required></div>
       <div class="fg"><label>CEP *</label><input type="text" name="cep" value="{{ old('cep') }}" placeholder="89800-000" required></div>

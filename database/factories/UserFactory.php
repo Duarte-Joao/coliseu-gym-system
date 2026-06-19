@@ -28,14 +28,14 @@ class UserFactory extends Factory
             'name' => fake()->name(),
             'email' => fake()->unique()->safeEmail(),
             'email_verified_at' => now(),
-            'password' => static::$password ??= Hash::make('password'),
+            'password' => static::$password ??= 'password',
             'remember_token' => Str::random(10),
             'two_factor_secret' => null,
             'two_factor_recovery_codes' => null,
             'two_factor_confirmed_at' => null,
             
             // Novos campos do domínio de academia
-            'cpf' => fake()->numerify('###.###.###-##'), // CPF formatado de maneira segura
+            'rg' => fake()->numerify('##.###.###-#'),
             'data_nascimento' => fake()->date('Y-m-d', '-14 years'), // Idade >= 14 anos
             'rua' => fake()->streetName(),
             'numero_rua' => fake()->numberBetween(1, 2500),

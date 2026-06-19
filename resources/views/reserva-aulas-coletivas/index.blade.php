@@ -1,10 +1,28 @@
 @extends('layouts.gym')
 @section('title', 'Reservas')
 @section('content')
-<div class="pg-header">
-  <div><h1>Reservas</h1><p>Reservas em aulas coletivas</p></div>
+<x-page-header title="Reservas" subtitle="Reservas em aulas coletivas">
   <a href="{{ route('reserva-aulas-coletivas.create') }}" class="btn"><i class="ti ti-plus"></i> Nova Reserva</a>
-</div>
+</x-page-header>
+
+<form class="filter-bar" method="GET">
+  <div class="fg" style="flex:2;min-width:200px">
+    <label>Buscar</label>
+    <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Aluno ou modalidade...">
+  </div>
+  <div class="fg">
+    <label>Status</label>
+    <select name="status">
+      <option value="">Todos</option>
+      <option value="confirmada" {{ request('status') === 'confirmada' ? 'selected' : '' }}>Confirmada</option>
+      <option value="presenca_confirmada" {{ request('status') === 'presenca_confirmada' ? 'selected' : '' }}>Presença confirmada</option>
+      <option value="cancelada" {{ request('status') === 'cancelada' ? 'selected' : '' }}>Cancelada</option>
+    </select>
+  </div>
+  <button type="submit" class="btn ghost"><i class="ti ti-search"></i> Filtrar</button>
+  <a href="{{ route('reserva-aulas-coletivas.index') }}" class="btn ghost"><i class="ti ti-x"></i></a>
+</form>
+
 <div class="tbl-wrap">
   <div class="tbl-head"><h3>{{ $reservas->total() }} reserva(s)</h3></div>
   @if($reservas->isEmpty())
