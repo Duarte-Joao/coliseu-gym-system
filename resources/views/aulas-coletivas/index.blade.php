@@ -1,12 +1,12 @@
 @extends('layouts.gym')
 @section('title', 'Aulas Coletivas')
 @section('content')
-<div class="pg-header">
-  <div><h1>Aulas Coletivas</h1><p>Grade de aulas coletivas</p></div>
+<x-page-header title="Aulas Coletivas" subtitle="Grade de aulas coletivas">
   <a href="{{ route('aulas-coletivas.create') }}" class="btn"><i class="ti ti-plus"></i> Nova Aula</a>
-</div>
+</x-page-header>
 
 <form class="filter-bar" method="GET">
+  @if(!isset($meuInstrutor) || !$meuInstrutor)
   <div class="fg">
     <label>Instrutor</label>
     <select name="instrutor_id">
@@ -16,6 +16,7 @@
       @endforeach
     </select>
   </div>
+  @endif
   <div class="fg">
     <label>Status</label>
     <select name="status">
@@ -35,12 +36,18 @@
     <div class="empty"><i class="ti ti-calendar-event"></i>Nenhuma aula cadastrada</div>
   @else
   <table>
-    <thead><tr><th>Modalidade</th><th>Instrutor</th><th>Data/Hora</th><th>Vagas</th><th>Ocupado</th><th>Status</th><th></th></tr></thead>
+    <thead><tr>
+      <th>Modalidade</th>
+      @if(!isset($meuInstrutor) || !$meuInstrutor)<th>Instrutor</th>@endif
+      <th>Data/Hora</th><th>Vagas</th><th>Ocupado</th><th>Status</th><th></th>
+    </tr></thead>
     <tbody>
     @foreach($aulas as $aula)
     <tr>
       <td><strong>{{ $aula->modalidade }}</strong></td>
-      <td>{{ $aula->instrutor->usuario->name ?? '—' }}</td>
+      @if(!isset($meuInstrutor) || !$meuInstrutor)
+        <td>{{ $aula->instrutor->usuario->name ?? '—' }}</td>
+      @endif
       <td>{{ $aula->datahora?->format('d/m/Y H:i') }}</td>
       <td>{{ $aula->vagas }}</td>
       <td>{{ $aula->reservas_count }}</td>

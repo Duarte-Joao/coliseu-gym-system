@@ -2,11 +2,11 @@
 
 namespace Database\Seeders;
 
+use App\Models\Instrutor;
 use App\Models\Treino;
 use App\Models\TreinoAluno;
 use App\Models\User;
 use Illuminate\Database\Seeder;
-use Illuminate\Support\Facades\Hash;
 
 class DatabaseSeeder extends Seeder
 {
@@ -19,13 +19,24 @@ class DatabaseSeeder extends Seeder
         User::factory()->admin()->create([
             'name' => 'Administrador Coliseu',
             'email' => 'admin@coliseu.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
         ]);
 
         $alunoPadrao = User::factory()->aluno()->create([
             'name' => 'João Aluno',
             'email' => 'aluno@coliseu.com',
-            'password' => Hash::make('password'),
+            'password' => 'password',
+        ]);
+
+        $instrutorPadrao = User::factory()->instrutor()->create([
+            'name' => 'Carlos Treinador',
+            'email' => 'instrutor@coliseu.com',
+            'password' => 'password',
+        ]);
+        Instrutor::factory()->create([
+            'usuario_id'    => $instrutorPadrao->id,
+            'especialidade' => 'Musculação',
+            'turno'         => 'Manhã',
         ]);
 
         // 2. Criar mais 15 alunos aleatórios adicionais na academia
@@ -51,10 +62,9 @@ class DatabaseSeeder extends Seeder
                     
                     TreinoAluno::create([
                         'usuario_id' => $aluno->id,
-                        'treino_id' => $treino->id,
-                        'data_inicio' => now()->subDays(rand(10, 60))->format('Y-m-d'),
-                        'data_fim' => $ativo ? null : now()->subDays(rand(1, 9))->format('Y-m-d'),
-                        'descricao' => $ativo ? 'Programa de hipertrofia atual.' : 'Programa de adaptação concluído.',
+                        'treino_id'  => $treino->id,
+                        'validade'   => now()->addYear()->format('Y-m-d'),
+                        'descricao'  => $ativo ? 'Programa de hipertrofia atual.' : 'Programa de adaptação concluído.',
                     ]);
                 }
             }

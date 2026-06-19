@@ -7,7 +7,7 @@ use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
-#[Fillable(['usuario_id', 'treino_id', 'data_inicio', 'data_fim', 'descricao'])]
+#[Fillable(['usuario_id', 'treino_id', 'validade', 'descricao'])]
 class TreinoAluno extends Model
 {
     use HasFactory;
@@ -25,8 +25,7 @@ class TreinoAluno extends Model
     protected function casts(): array
     {
         return [
-            'data_inicio' => 'date',
-            'data_fim' => 'date',
+            'validade' => 'date',
         ];
     }
 

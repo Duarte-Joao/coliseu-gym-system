@@ -1,16 +1,15 @@
 @extends('layouts.gym')
 @section('title', 'Registrar Pagamento')
 @section('content')
-<div class="pg-header">
-  <div><h1>Registrar Pagamento</h1></div>
+<x-page-header title="Registrar Pagamento">
   <a href="{{ route('pagamento-plano-alunos.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 <div class="form-card">
   <form method="POST" action="{{ route('pagamento-plano-alunos.store') }}">
     @csrf
     <div class="form-grid">
       <div class="fg span2">
-        <label>Plano *</label>
+        <label>Aluno *</label>
         <select name="plano_aluno_id" required>
           <option value="">Selecione...</option>
           @foreach($planos as $p)
@@ -20,7 +19,15 @@
           @endforeach
         </select>
       </div>
-      <div class="fg span2"><label>Método de Pagamento *</label><input type="text" name="metodo_pagamento" value="{{ old('metodo_pagamento') }}" placeholder="Ex: Pix, Cartão, Dinheiro" required></div>
+      <div class="fg span2">
+        <label>Método de Pagamento *</label>
+        <select name="tipo" required>
+          <option value="">Selecione...</option>
+          @foreach(['Pix', 'Cartão de Crédito', 'Cartão de Débito', 'Dinheiro', 'Boleto'] as $metodo)
+            <option value="{{ $metodo }}" {{ old('tipo') === $metodo ? 'selected' : '' }}>{{ $metodo }}</option>
+          @endforeach
+        </select>
+      </div>
       <div class="fg"><label>Data *</label><input type="date" name="data" value="{{ old('data', date('Y-m-d')) }}" required></div>
       <div class="fg">
         <label>Status</label>

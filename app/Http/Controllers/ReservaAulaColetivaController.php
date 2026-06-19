@@ -18,11 +18,13 @@ class ReservaAulaColetivaController extends Controller
     {
         $query = ReservaAulaColetiva::query()->with(['aula', 'aluno']);
 
-        if ($request->filled('aula_coletiva_id')) {
-            $query->where('aula_coletiva_id', $request->aula_coletiva_id);
+        if ($request->filled('busca')) {
+            $query->where(fn($q) => $q
+                ->whereHas('aluno', fn($q2) => $q2->where('name', 'like', "%{$request->busca}%"))
+                ->orWhereHas('aula', fn($q2) => $q2->where('modalidade', 'like', "%{$request->busca}%")));
         }
-        if ($request->filled('usuario_id')) {
-            $query->where('usuario_id', $request->usuario_id);
+        if ($request->filled('status')) {
+            $query->where('status', $request->status);
         }
 
         $reservas = $query->paginate(15)->withQueryString();
@@ -69,7 +71,12 @@ class ReservaAulaColetivaController extends Controller
 
         ReservaAulaColetiva::create($validated);
 
-        return redirect()->route('reserva-aulas-coletivas.index')->with('success', 'Reserva realizada com sucesso!');
+        $from = $request->input('_from');
+        $redirect = $from === 'aluno-dashboard'
+            ? redirect()->route('dashboard.aluno')
+            : redirect()->route('reserva-aulas-coletivas.index');
+
+        return $redirect->with('success', 'Reserva realizada com sucesso!');
     }
 
     public function show(ReservaAulaColetiva $reserva): View

@@ -1,8 +1,7 @@
 @extends('layouts.gym')
 @section('title', 'Reserva')
 @section('content')
-<div class="pg-header">
-  <div><h1>Reserva</h1><p>{{ $reserva->aluno->name ?? '' }} — {{ $reserva->aula->modalidade ?? '' }}</p></div>
+<x-page-header title="Reserva" :subtitle="($reserva->aluno->name ?? '') . ' — ' . ($reserva->aula->modalidade ?? '')">
   <div class="actions">
     <a href="{{ route('reserva-aulas-coletivas.edit', $reserva) }}" class="btn ghost"><i class="ti ti-pencil"></i> Editar</a>
     <form method="POST" action="{{ route('reserva-aulas-coletivas.destroy', $reserva) }}" onsubmit="return confirm('Cancelar reserva?')">
@@ -11,7 +10,7 @@
     </form>
     <a href="{{ route('reserva-aulas-coletivas.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
   </div>
-</div>
+</x-page-header>
 <div class="detail-card">
   <div class="detail-grid">
     <div class="detail-item"><label>Aluno</label><span>{{ $reserva->aluno->name ?? '—' }}</span></div>

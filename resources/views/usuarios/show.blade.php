@@ -1,8 +1,7 @@
 @extends('layouts.gym')
 @section('title', $usuario->name)
 @section('content')
-<div class="pg-header">
-  <div><h1>{{ $usuario->name }}</h1><p>Perfil do usuário</p></div>
+<x-page-header :title="$usuario->name" subtitle="Perfil do usuário">
   <div class="actions">
     <a href="{{ route('usuarios.edit', $usuario) }}" class="btn ghost"><i class="ti ti-pencil"></i> Editar</a>
     <form method="POST" action="{{ route('usuarios.destroy', $usuario) }}" onsubmit="return confirm('Excluir este usuário?')">
@@ -11,7 +10,7 @@
     </form>
     <a href="{{ route('usuarios.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
   </div>
-</div>
+</x-page-header>
 <div class="detail-card">
   <div class="detail-header">
     <h2>{{ $usuario->name }}</h2>
@@ -19,7 +18,7 @@
   </div>
   <div class="detail-grid">
     <div class="detail-item"><label>E-mail</label><span>{{ $usuario->email }}</span></div>
-    <div class="detail-item"><label>CPF</label><span>{{ $usuario->cpf ?? '—' }}</span></div>
+    <div class="detail-item"><label>RG</label><span>{{ $usuario->rg ?? '—' }}</span></div>
     <div class="detail-item"><label>Nascimento</label><span>{{ $usuario->data_nascimento?->format('d/m/Y') ?? '—' }}</span></div>
     <div class="detail-item"><label>Telefone</label><span>{{ $usuario->numero_telefone ?? '—' }}</span></div>
     <div class="detail-item"><label>Tipo</label><span>{{ $usuario->tipo ?? '—' }}</span></div>

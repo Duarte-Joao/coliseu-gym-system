@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Instrutores')
 @section('content')
-<div class="pg-header">
-  <div><h1>Instrutores</h1><p>Gerencie os instrutores da academia</p></div>
+<x-page-header title="Instrutores" subtitle="Gerencie os instrutores da academia">
   <a href="{{ route('instrutores.create') }}" class="btn"><i class="ti ti-plus"></i> Novo Instrutor</a>
-</div>
+</x-page-header>
 
 <form class="filter-bar" method="GET">
   <div class="fg">

@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Editar Instrutor')
 @section('content')
-<div class="pg-header">
-  <div><h1>Editar Instrutor</h1><p>{{ $instrutor->usuario->name ?? '' }}</p></div>
+<x-page-header title="Editar Instrutor" :subtitle="$instrutor->usuario->name ?? ''">
   <a href="{{ route('instrutores.show', $instrutor) }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 
 <div class="form-card">
   <form method="POST" action="{{ route('instrutores.update', $instrutor) }}">

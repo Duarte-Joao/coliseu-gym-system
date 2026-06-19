@@ -21,17 +21,11 @@ class TreinoAlunoFactory extends Factory
      */
     public function definition(): array
     {
-        $dataInicio = fake()->dateTimeBetween('-4 months', 'now');
-        
-        // 40% de chance de o treino já ter expirado ou ter data fim planejada
-        $dataFim = fake()->optional(0.4)->dateTimeBetween($dataInicio, '+3 months');
-
         return [
             'usuario_id' => User::factory()->aluno(),
-            'treino_id' => Treino::factory(),
-            'data_inicio' => $dataInicio->format('Y-m-d'),
-            'data_fim' => $dataFim ? $dataFim->format('Y-m-d') : null,
-            'descricao' => fake()->optional(0.6)->sentence(),
+            'treino_id'  => Treino::factory(),
+            'validade'   => fake()->dateTimeBetween('now', '+1 year')->format('Y-m-d'),
+            'descricao'  => fake()->optional(0.6)->sentence(),
         ];
     }
 }

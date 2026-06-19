@@ -1,28 +1,6 @@
-<!DOCTYPE html>
-<html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Coliseu Gym - Home</title>
-    <link href="https://fonts.googleapis.com/css2?family=Bebas+Neue&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="{{ asset('css/coliseu.css') }}">
-</head>
-<body>
-
-    <!-- NAVBAR -->
-    <header class="navbar">
-        <div class="logo">
-            Coliseu <span>Gym</span>
-            <small>Desde 2026 · Chapecó - SC</small>
-        </div>
-        <nav>
-            <a href="{{ route('home') }}">Início</a>
-            <a href="{{ route('planos') }}">Planos</a>
-            <a href="{{ route('contato') }}">Contato</a>
-            <a href="{{ route('login') }}">Login</a>
-            <a href="{{ route('planos') }}" class="btn-nav">Matricule-se</a>
-        </nav>
-    </header>
+@extends('layouts.public')
+@section('title', 'Coliseu Gym - Home')
+@section('content')
 
     <main class="hero">
         <div class="hero-bg"></div>
@@ -103,14 +81,12 @@
         </div>
     </section>
 
-    <!-- Planos  -->
     <section class="plans">
         <div class="section-label">Planos</div>
         <h2 class="section-title">Escolha seu plano de batalha</h2>
 
         <div class="plans-grid" style="grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1.5rem;">
-            
-            <!-- PLANO MENSAL -->
+
             <div class="plan-card">
                 <div class="plan-name">Mensal</div>
                 <div class="plan-price">R$ 119<span>,90</span></div>
@@ -125,7 +101,6 @@
                 <a href="{{ route('planos') }}" class="plan-btn">Matricular-se</a>
             </div>
 
-            <!-- PLANO TRIMESTRAL -->
             <div class="plan-card">
                 <div class="plan-name">Trimestral</div>
                 <div class="plan-price">R$ 299<span>,90</span></div>
@@ -140,7 +115,6 @@
                 <a href="{{ route('planos') }}" class="plan-btn">Matricular-se</a>
             </div>
 
-            <!-- PLANO SEMESTRAL (DESTAQUE) o melhor dos planos -->
             <div class="plan-card featured">
                 <div class="plan-badge">Melhor Custo-Benefício</div>
                 <div class="plan-name">Semestral</div>
@@ -157,7 +131,6 @@
                 <a href="{{ route('planos') }}" class="plan-btn">Matricular-se</a>
             </div>
 
-            <!-- PLANO ANUAL -->
             <div class="plan-card">
                 <div class="plan-name">Anual</div>
                 <div class="plan-price">R$ 959<span>,90</span></div>
@@ -176,15 +149,4 @@
         </div>
     </section>
 
-    <footer>
-        <div class="footer-logo">Coliseu <span>Gym</span></div>
-        <div class="footer-links">
-            <a href="#">Instagram</a>
-            <a href="#">WhatsApp</a>
-            <a href="#">Localização</a>
-        </div>
-        <div class="footer-copy">© 2026 Coliseu Gym · Todos os direitos reservados</div>
-    </footer>
-
-</body>
-</html>
+@endsection

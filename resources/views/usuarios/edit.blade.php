@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Editar Usuário')
 @section('content')
-<div class="pg-header">
-  <div><h1>Editar Usuário</h1><p>{{ $usuario->name }}</p></div>
+<x-page-header title="Editar Usuário" :subtitle="$usuario->name">
   <a href="{{ route('usuarios.show', $usuario) }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 
 <div class="form-card">
   <form method="POST" action="{{ route('usuarios.update', $usuario) }}">
@@ -12,7 +11,7 @@
     <div class="form-grid">
       <div class="fg span2"><label>Nome *</label><input type="text" name="name" value="{{ old('name', $usuario->name) }}" required></div>
       <div class="fg"><label>E-mail *</label><input type="email" name="email" value="{{ old('email', $usuario->email) }}" required></div>
-      <div class="fg"><label>CPF *</label><input type="text" name="cpf" value="{{ old('cpf', $usuario->cpf) }}" required></div>
+      <div class="fg"><label>RG *</label><input type="text" name="rg" value="{{ old('rg', $usuario->rg) }}" placeholder="00.000.000-0" required></div>
       <div class="fg"><label>Data de Nascimento *</label><input type="date" name="data_nascimento" value="{{ old('data_nascimento', $usuario->data_nascimento?->format('Y-m-d')) }}" required></div>
       <div class="fg"><label>Telefone *</label><input type="text" name="numero_telefone" value="{{ old('numero_telefone', $usuario->numero_telefone) }}" required></div>
       <div class="fg"><label>CEP *</label><input type="text" name="cep" value="{{ old('cep', $usuario->cep) }}" required></div>

@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Editar Treino')
 @section('content')
-<div class="pg-header">
-  <div><h1>Editar Treino</h1><p>{{ $treino->nome }}</p></div>
+<x-page-header title="Editar Treino" :subtitle="$treino->nome">
   <a href="{{ route('treinos.show', $treino) }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 
 <div class="form-card">
   <form method="POST" action="{{ route('treinos.update', $treino) }}" enctype="multipart/form-data">
@@ -12,20 +11,24 @@
     <div class="form-grid">
       <div class="fg">
         <label>Instrutor</label>
-        <select name="instrutor_id" disabled>
-          @foreach($instrutores as $i)
-            <option value="{{ $i->id }}" {{ $treino->instrutor_id == $i->id ? 'selected' : '' }}>{{ $i->usuario->name }}</option>
-          @endforeach
-        </select>
-        <small style="color:var(--muted);font-size:0.78rem">O instrutor não pode ser alterado</small>
+        @if($meuInstrutor)
+          <input type="text" value="{{ auth()->user()->name }}" disabled>
+        @else
+          <select name="instrutor_id" disabled>
+            @foreach($instrutores as $i)
+              <option value="{{ $i->id }}" {{ $treino->instrutor_id == $i->id ? 'selected' : '' }}>{{ $i->usuario->name }}</option>
+            @endforeach
+          </select>
+          <small style="color:var(--muted);font-size:0.78rem">O instrutor não pode ser alterado</small>
+        @endif
       </div>
       <div class="fg">
         <label>Nome do Treino *</label>
         <input type="text" name="nome" value="{{ old('nome', $treino->nome) }}" required>
       </div>
       <div class="fg span2">
-        <label>Observações</label>
-        <textarea name="obs">{{ old('obs', $treino->obs) }}</textarea>
+        <label>Descrição</label>
+        <textarea name="descricao">{{ old('descricao', $treino->descricao) }}</textarea>
       </div>
     </div>
 

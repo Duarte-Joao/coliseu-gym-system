@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Editar Reserva')
 @section('content')
-<div class="pg-header">
-  <div><h1>Editar Reserva</h1><p>{{ $reserva->aluno->name ?? '' }} — {{ $reserva->aula->modalidade ?? '' }}</p></div>
+<x-page-header title="Editar Reserva" :subtitle="($reserva->aluno->name ?? '') . ' — ' . ($reserva->aula->modalidade ?? '')">
   <a href="{{ route('reserva-aulas-coletivas.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 <div class="form-card">
   <form method="POST" action="{{ route('reserva-aulas-coletivas.update', $reserva) }}">
     @csrf @method('PUT')

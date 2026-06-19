@@ -1,15 +1,32 @@
 @extends('layouts.gym')
 @section('title', 'Planos')
 @section('content')
-<div class="pg-header">
-  <div><h1>Planos</h1><p>Planos contratados pelos alunos</p></div>
+<x-page-header title="Planos" subtitle="Planos contratados pelos alunos">
   <a href="{{ route('plano-alunos.create') }}" class="btn"><i class="ti ti-plus"></i> Novo Plano</a>
-</div>
+</x-page-header>
+
+<form class="filter-bar" method="GET">
+  <div class="fg" style="flex:2;min-width:200px">
+    <label>Buscar aluno</label>
+    <input type="text" name="busca" value="{{ request('busca') }}" placeholder="Nome do aluno...">
+  </div>
+  <div class="fg">
+    <label>Tipo de plano</label>
+    <select name="tipo">
+      <option value="">Todos</option>
+      @foreach(['Mensal','Trimestral','Semestral','Anual'] as $t)
+        <option value="{{ $t }}" {{ request('tipo') === $t ? 'selected' : '' }}>{{ $t }}</option>
+      @endforeach
+    </select>
+  </div>
+  <button type="submit" class="btn ghost"><i class="ti ti-search"></i> Filtrar</button>
+  <a href="{{ route('plano-alunos.index') }}" class="btn ghost"><i class="ti ti-x"></i></a>
+</form>
 
 <div class="tbl-wrap">
   <div class="tbl-head"><h3>{{ $planos->total() }} plano(s)</h3></div>
   @if($planos->isEmpty())
-    <div class="empty"><i class="ti ti-id-badge-2"></i>Nenhum plano cadastrado</div>
+    <div class="empty"><i class="ti ti-id-badge-2"></i>Nenhum plano encontrado</div>
   @else
   <table>
     <thead><tr><th>Aluno</th><th>Tipo</th><th>Valor</th><th>Duração</th><th>Início</th><th>Fim</th><th>Pagamentos</th><th></th></tr></thead>

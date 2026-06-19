@@ -1,10 +1,9 @@
 @extends('layouts.gym')
 @section('title', 'Nova Reserva')
 @section('content')
-<div class="pg-header">
-  <div><h1>Nova Reserva</h1></div>
+<x-page-header title="Nova Reserva">
   <a href="{{ route('reserva-aulas-coletivas.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
-</div>
+</x-page-header>
 <div class="form-card">
   <form method="POST" action="{{ route('reserva-aulas-coletivas.store') }}">
     @csrf

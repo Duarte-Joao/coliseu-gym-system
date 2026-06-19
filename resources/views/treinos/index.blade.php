@@ -1,12 +1,12 @@
 @extends('layouts.gym')
 @section('title', 'Treinos')
 @section('content')
-<div class="pg-header">
-  <div><h1>Treinos</h1><p>Gerencie os templates de treino</p></div>
+<x-page-header title="Treinos" subtitle="Gerencie os templates de treino">
   <a href="{{ route('treinos.create') }}" class="btn"><i class="ti ti-plus"></i> Novo Treino</a>
-</div>
+</x-page-header>
 
 <form class="filter-bar" method="GET">
+  @if(!isset($meuInstrutor) || !$meuInstrutor)
   <div class="fg">
     <label>Instrutor</label>
     <select name="instrutor_id">
@@ -16,7 +16,8 @@
       @endforeach
     </select>
   </div>
-  <div class="fg">
+  @endif
+  <div class="fg" style="flex:2;min-width:180px">
     <label>Nome</label>
     <input type="text" name="nome" value="{{ request('nome') }}" placeholder="Buscar por nome...">
   </div>
@@ -31,13 +32,17 @@
   @else
   <table>
     <thead><tr>
-      <th>Nome</th><th>Instrutor</th><th>Exercícios</th><th>Criado em</th><th></th>
+      <th>Nome</th>
+      @if(!isset($meuInstrutor) || !$meuInstrutor)<th>Instrutor</th>@endif
+      <th>Exercícios</th><th>Criado em</th><th></th>
     </tr></thead>
     <tbody>
     @foreach($treinos as $treino)
     <tr>
-      <td><strong>{{ $treino->nome }}</strong>@if($treino->obs)<span class="sub">{{ Str::limit($treino->obs, 60) }}</span>@endif</td>
-      <td>{{ $treino->instrutor->usuario->name ?? '—' }}</td>
+      <td><strong>{{ $treino->nome }}</strong>@if($treino->descricao)<span class="sub">{{ Str::limit($treino->descricao, 60) }}</span>@endif</td>
+      @if(!isset($meuInstrutor) || !$meuInstrutor)
+        <td>{{ $treino->instrutor->usuario->name ?? '—' }}</td>
+      @endif
       <td><span class="badge b-pur">{{ count($treino->exercicios ?? []) }} exerc.</span></td>
       <td>{{ $treino->created_at->format('d/m/Y') }}</td>
       <td>

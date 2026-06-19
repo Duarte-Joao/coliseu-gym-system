@@ -1,8 +1,7 @@
 @extends('layouts.gym')
 @section('title', $aula->modalidade)
 @section('content')
-<div class="pg-header">
-  <div><h1>{{ $aula->modalidade }}</h1><p>{{ $aula->datahora?->format('d/m/Y H:i') }}</p></div>
+<x-page-header :title="$aula->modalidade" :subtitle="$aula->datahora?->format('d/m/Y H:i')">
   <div class="actions">
     <a href="{{ route('aulas-coletivas.edit', $aula) }}" class="btn ghost"><i class="ti ti-pencil"></i> Editar</a>
     <form method="POST" action="{{ route('aulas-coletivas.destroy', $aula) }}" onsubmit="return confirm('Excluir esta aula?')">
@@ -11,7 +10,7 @@
     </form>
     <a href="{{ route('aulas-coletivas.index') }}" class="btn ghost"><i class="ti ti-arrow-left"></i> Voltar</a>
   </div>
-</div>
+</x-page-header>
 <div class="detail-card">
   <div class="detail-header">
     <h2>{{ $aula->modalidade }}</h2>
@@ -37,7 +36,6 @@
       <td><span class="badge {{ $r->status === 'presenca_confirmada' ? 'b-ok' : ($r->status === 'cancelada' ? 'b-err' : 'b-pur') }}">{{ $r->status }}</span></td>
       <td>
         <div class="actions">
-          <a href="{{ route('reserva-aulas-coletivas.edit', $r) }}" class="btn ghost btn-sm"><i class="ti ti-pencil"></i></a>
           <form method="POST" action="{{ route('reserva-aulas-coletivas.destroy', $r) }}" onsubmit="return confirm('Cancelar reserva?')">
             @csrf @method('DELETE')
             <button type="submit" class="btn danger btn-sm"><i class="ti ti-trash"></i></button>
