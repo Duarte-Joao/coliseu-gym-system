@@ -102,7 +102,7 @@
   .pag-btn.disabled{opacity:0.35;cursor:not-allowed}
   .pag-btn.dots{background:transparent;border-color:transparent;cursor:default;color:var(--muted)}
 </style>
-@stack('styles')
+@stack('styles') 
 </head>
 <body>
 <div class="lay">

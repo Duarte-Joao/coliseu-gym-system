@@ -1,6 +1,6 @@
 <?php
 
-use App\Actions\Fortify\CreateNewUser;
+use App\Actions\CreateNewUser;
 use App\Http\Controllers\AlunoDashboardController;
 use App\Http\Controllers\AulaColetivaController;
 use App\Http\Controllers\InstrutorController;
@@ -51,6 +51,13 @@ Route::post('/cadastro', function (Request $request) {
     (new CreateNewUser())->create($request->all());
     return redirect()->route('login')->with('success', 'Conta criada com sucesso! Faça login.');
 })->name('register.post');
+
+Route::post('/logout', function (Request $request) {
+    Auth::logout();
+    $request->session()->invalidate();
+    $request->session()->regenerateToken();
+    return redirect()->route('home');
+})->name('logout');
 
 // ── ROTAS AUTENTICADAS ───────────────────────────────────────
 Route::middleware('auth')->group(function () {
