@@ -10,11 +10,7 @@ use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Contracts\View\View;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
-<<<<<<< HEAD
-use Illuminate\Support\Facades\Storage;
-=======
 use Illuminate\Http\Response;
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
 
 class TreinoController extends Controller
 {
@@ -60,20 +56,6 @@ class TreinoController extends Controller
         $meuInstrutor = $this->instrutorAtual();
 
         $validated = $request->validate([
-<<<<<<< HEAD
-            'instrutor_id'             => 'required|exists:instrutores,id',
-            'nome'                     => 'required|string|max:255',
-            'obs'                      => 'nullable|string',
-            'exercicios'               => 'required|array|min:1',
-            'exercicios.*.nome'        => 'required|string|max:255',
-            'exercicios.*.series'      => 'required|integer|min:1',
-            'exercicios.*.repeticoes'  => 'required|integer|min:1',
-            'exercicios.*.carga'       => 'required|numeric|min:0',
-            'exercicios.*.imagem'      => 'nullable|image|max:2048',
-        ]);
-
-        $validated['exercicios'] = $this->processExercicios($request, $validated['exercicios']);
-=======
             'instrutor_id'            => $meuInstrutor ? 'nullable' : 'required|exists:instrutores,id',
             'nome'                    => 'required|string|max:255',
             'descricao'               => 'nullable|string',
@@ -82,12 +64,14 @@ class TreinoController extends Controller
             'exercicios.*.series'     => 'required|integer|min:1',
             'exercicios.*.repeticoes' => 'required|integer|min:1',
             'exercicios.*.carga'      => 'required|numeric|min:0',
+            'exercicios.*.imagem'     => 'nullable|image|max:2048',
         ]);
 
         if ($meuInstrutor) {
             $validated['instrutor_id'] = $meuInstrutor->id;
         }
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
+
+        $validated['exercicios'] = $this->processExercicios($request, $validated['exercicios']);
 
         Treino::create($validated);
 
@@ -152,9 +136,8 @@ class TreinoController extends Controller
         if ($meuInstrutor && $treino->instrutor_id !== $meuInstrutor->id) abort(403);
 
         $validated = $request->validate([
-<<<<<<< HEAD
             'nome'                       => 'required|string|max:255',
-            'obs'                        => 'nullable|string',
+            'descricao'                  => 'nullable|string',
             'exercicios'                 => 'required|array|min:1',
             'exercicios.*.nome'          => 'required|string|max:255',
             'exercicios.*.series'        => 'required|integer|min:1',
@@ -162,15 +145,6 @@ class TreinoController extends Controller
             'exercicios.*.carga'         => 'required|numeric|min:0',
             'exercicios.*.imagem'        => 'nullable|image|max:2048',
             'exercicios.*.imagem_antiga' => 'nullable|string',
-=======
-            'nome'                    => 'required|string|max:255',
-            'descricao'               => 'nullable|string',
-            'exercicios'              => 'required|array|min:1',
-            'exercicios.*.nome'       => 'required|string|max:255',
-            'exercicios.*.series'     => 'required|integer|min:1',
-            'exercicios.*.repeticoes' => 'required|integer|min:1',
-            'exercicios.*.carga'      => 'required|numeric|min:0',
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
         ]);
 
         $validated['exercicios'] = $this->processExercicios($request, $validated['exercicios']);

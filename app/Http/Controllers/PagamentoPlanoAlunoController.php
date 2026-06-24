@@ -33,7 +33,27 @@ class PagamentoPlanoAlunoController extends Controller
 
         $pagamentos = $query->paginate(15)->withQueryString();
 
-        return view('pagamento-plano-alunos.index', compact('pagamentos'));
+        // Chart: últimos 6 meses
+        $meses_ptbr   = ['Jan','Fev','Mar','Abr','Mai','Jun','Jul','Ago','Set','Out','Nov','Dez'];
+        $chartLabels   = [];
+        $chartReceita  = [];
+        $chartPendente = [];
+
+        $todosPagamentos = PagamentoPlanoAluno::with('plano')
+            ->where('data', '>=', now()->subMonths(5)->startOfMonth())
+            ->get();
+
+        for ($i = 5; $i >= 0; $i--) {
+            $d       = now()->subMonths($i);
+            $chartLabels[] = $meses_ptbr[(int) $d->format('n') - 1] . '/' . $d->format('y');
+            $doMes   = $todosPagamentos->filter(
+                fn($p) => $p->data && $p->data->year === (int) $d->year && $p->data->month === (int) $d->month
+            );
+            $chartReceita[]  = round((float) $doMes->where('status', 'pago')->sum(fn($p) => (float) ($p->plano->valor ?? 0)), 2);
+            $chartPendente[] = round((float) $doMes->where('status', 'pendente')->sum(fn($p) => (float) ($p->plano->valor ?? 0)), 2);
+        }
+
+        return view('pagamento-plano-alunos.index', compact('pagamentos', 'chartLabels', 'chartReceita', 'chartPendente'));
     }
 
     public function pdf(Request $request): Response

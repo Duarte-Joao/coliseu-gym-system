@@ -10,8 +10,7 @@
         </p>
 
         <div class="plans-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
-<<<<<<< HEAD
-            
+
             @foreach($planosDisponiveis as $plano)
             <div class="plan-card @if($plano->featured) featured @endif">
                 @if($plano->featured)
@@ -20,43 +19,6 @@
                 <div class="plan-name">{{ $plano->tipo }}</div>
                 <div class="plan-price">R$ {{ number_format($plano->valor, 0, '', '') }}<span>,{{ sprintf('%02d', ($plano->valor * 100) % 100) }}</span></div>
                 <p style="font-size: 0.85rem; color: @if($plano->featured) rgba(255,255,255,0.8) @else var(--gold) @endif; margin-top: 0.3rem;">{{ $plano->descricao }}</p>
-                
-=======
-
-            <div class="plan-card">
-                <div class="plan-name">Mensal</div>
-                <div class="plan-price">R$ 119<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: var(--gold); margin-top: 0.3rem;">Adesão padrão de 1 mês</p>
-                <div class="plan-divider"></div>
-                <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso total à musculação</li>
-                    <li>Livre escolha de horários</li>
-                    <li>Sem fidelidade ou contrato</li>
-                    <li>Renovação mensal opcional</li>
-                </ul>
-                <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
-            </div>
-
-            <div class="plan-card">
-                <div class="plan-name">Trimestral</div>
-                <div class="plan-price">R$ 299<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: var(--white-60); margin-top: 0.3rem;">Equivale a R$ 99,96/mês</p>
-                <div class="plan-divider"></div>
-                <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso total à musculação</li>
-                    <li>Válido por 3 meses corridos</li>
-                    <li>Avaliação física inclusa</li>
-                    <li>Economia garantida</li>
-                </ul>
-                <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
-            </div>
-
-            <div class="plan-card featured">
-                <div class="plan-badge">Melhor Custo-Benefício</div>
-                <div class="plan-name">Semestral</div>
-                <div class="plan-price">R$ 539<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-top: 0.3rem;">Equivale a R$ 89,98/mês</p>
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
                 <div class="plan-divider"></div>
                 <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
                     @foreach($plano->beneficios as $beneficio)
@@ -64,24 +26,6 @@
                     @endforeach
                 </ul>
                 <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
-<<<<<<< HEAD
-=======
-            </div>
-
-            <div class="plan-card">
-                <div class="plan-name">Anual</div>
-                <div class="plan-price">R$ 959<span>,90</span></div>
-                <p style="font-size: 0.85rem; color: var(--white-60); margin-top: 0.3rem;">Equivale a R$ 79,99/mês</p>
-                <div class="plan-divider"></div>
-                <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso total 365 dias no ano</li>
-                    <li>Válido por 12 meses corridos</li>
-                    <li>Avaliações físicas bimestrais</li>
-                    <li>Acesso prioritário a eventos</li>
-                    <li>Maior desconto da casa</li>
-                </ul>
-                <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
             </div>
             @endforeach
 

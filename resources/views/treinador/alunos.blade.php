@@ -22,6 +22,7 @@
 
 @section('content')
 <x-page-header title="Meus Alunos" subtitle="{{ $totalAlunos }} aluno(s) vinculado(s)">
+  <a href="{{ route('treinador.alunos.pdf', request()->query()) }}" class="btn ghost" target="_blank"><i class="ti ti-file-type-pdf"></i> Exportar PDF</a>
   <a href="{{ route('treino-alunos.create') }}" class="btn"><i class="ti ti-user-plus"></i> Vincular Aluno</a>
 </x-page-header>
 

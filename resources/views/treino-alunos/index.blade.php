@@ -20,15 +20,11 @@
     <div class="empty"><i class="ti ti-clipboard-list"></i>Nenhuma atribuição encontrada</div>
   @else
   <table>
-<<<<<<< HEAD
-    <thead><tr><th>Aluno</th><th>Treino</th><th>Instrutor</th><th>Início</th><th>Fim</th><th>PDF</th><th>Ações</th></tr></thead>
-=======
     <thead><tr>
       <th>Aluno</th><th>Treino</th>
       @if(!isset($meuInstrutor) || !$meuInstrutor)<th>Instrutor</th>@endif
-      <th>Validade</th><th></th>
+      <th>Validade</th><th>PDF</th><th>Ações</th>
     </tr></thead>
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
     <tbody>
     @foreach($atribuicoes as $a)
     <tr>

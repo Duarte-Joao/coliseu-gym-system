@@ -9,6 +9,7 @@ use App\Http\Controllers\PagamentoPlanoAlunoController;
 use App\Http\Controllers\PlanoAlunoController;
 use App\Http\Controllers\ReservaAulaColetivaController;
 use App\Http\Controllers\TreinadorAlunosController;
+use App\Http\Controllers\TreinadorAlunosPdfController;
 use App\Http\Controllers\TreinadorDashboardController;
 use App\Http\Controllers\TreinadorPerfilController;
 use App\Http\Controllers\TreinoAlunoController;
@@ -139,7 +140,8 @@ Route::middleware('auth')->group(function () {
     Route::get('/dashboard-aluno',     AlunoDashboardController::class)->name('dashboard.aluno');
     Route::get('/dashboard-admin',     InstrutorDashboardController::class)->middleware('role:admin')->name('dashboard.admin');
     Route::get('/dashboard-treinador', TreinadorDashboardController::class)->middleware('role:instrutor')->name('dashboard.treinador');
-    Route::get('/treinador/alunos',    TreinadorAlunosController::class)->middleware('role:instrutor')->name('treinador.alunos');
+    Route::get('/treinador/alunos',     TreinadorAlunosController::class)->middleware('role:instrutor')->name('treinador.alunos');
+    Route::get('/treinador/alunos/pdf', TreinadorAlunosPdfController::class)->middleware('role:instrutor')->name('treinador.alunos.pdf');
     Route::get('/treinador/perfil',    TreinadorPerfilController::class)->middleware('role:instrutor')->name('treinador.perfil');
 
     // PDF exports

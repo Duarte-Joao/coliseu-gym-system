@@ -331,79 +331,13 @@
 
     <!-- TREINOS -->
     <section class="sec" id="sec-treinos">
-<<<<<<< HEAD
-      <div class="pg-header">
-        <h1>Fichas de Treino</h1>
-        <p>Suas prescrições ativas para o período atual.</p>
-      </div>
-
-      @if(isset($treinos) && $treinos->isNotEmpty())
-        @foreach($treinos as $index => $atribuicao)
-          <div class="treino-card">
-            <div class="tc-left">
-              <span class="tc-tag">Ficha {{ $index + 1 }}</span>
-              <h3>{{ $atribuicao->treino->nome }}</h3>
-              <p>Iniciou em {{ $atribuicao->data_inicio?->format('d/m/Y') }} · Fim {{ $atribuicao->data_fim?->format('d/m/Y') ?? 'Indefinido' }}</p>
-              @if($atribuicao->descricao)
-                <div class="obs"><i class="ti ti-alert-circle" style="font-size:14px"></i> {{ $atribuicao->descricao }}</div>
-              @endif
-            </div>
-            <button class="btn" type="button" onclick="toggleTreinoDetalhes({{ $index }})"><i class="ti ti-eye"></i> Detalhes</button>
-          </div>
-
-          <div id="treino-detalhes-{{ $index }}" class="tbl-wrap" style="display:none;margin-bottom:1rem;">
-            <div class="tbl-head"><h3>Exercícios da Ficha {{ $index + 1 }}</h3></div>
-            <div style="padding:1rem;">
-              @foreach($atribuicao->treino->exercicios as $exercicio)
-                <div class="ex-row" style="grid-template-columns:1.5fr 0.9fr 0.9fr;">
-                  <div class="ex-n"><span class="ex-dot"></span>{{ $exercicio['nome'] }}</div>
-                  <div class="ex-s">{{ $exercicio['series'] }}x{{ $exercicio['repeticoes'] }}</div>
-                  <div class="ex-c">{{ $exercicio['carga'] }} kg</div>
-                </div>
-                <div class="detail-card" style="margin-bottom:1rem;">
-                  <div class="detail-grid" style="grid-template-columns:1fr 1fr; gap:1rem;">
-                    <div class="detail-item" style="grid-column:span 2;">
-                      <label>Observações do exercício</label>
-                      <span>{{ $exercicio['obs'] ?? 'Nenhuma descrição adicional.' }}</span>
-                    </div>
-                    <div style="min-width:220px;">
-                      @if(!empty($exercicio['imagem']) && \Illuminate\Support\Facades\Storage::disk('public')->exists($exercicio['imagem']))
-                        <img src="{{ \Illuminate\Support\Facades\Storage::disk('public')->url($exercicio['imagem']) }}" alt="{{ $exercicio['nome'] }}" style="width:100%;border-radius:12px;display:block;">
-                      @else
-                        <div style="padding:1rem;border:1px dashed rgba(255,255,255,0.2);border-radius:12px;color:var(--muted);text-align:center;">
-                          Sem imagem disponível
-                        </div>
-                      @endif
-                    </div>
-                  </div>
-                </div>
-              @endforeach
-            </div>
-          </div>
-        @endforeach
-      @else
-        <div class="tbl-wrap">
-          <div class="empty"><i class="ti ti-barbell"></i> Nenhuma ficha de treino atribuída para você ainda.</div>
-        </div>
-      @endif
-
-      <script>
-        function toggleTreinoDetalhes(index) {
-          const detail = document.getElementById('treino-detalhes-' + index);
-          if (!detail) return;
-          detail.style.display = detail.style.display === 'none' ? 'block' : 'none';
-        }
-      </script>
-=======
       <x-page-header title="Fichas de Treino" subtitle="Suas prescrições ativas para o período atual." />
       @forelse($usuario->treinoAlunos as $ta)
       <div class="treino-card">
         <div class="tc-left">
           <span class="tc-tag">Ficha {{ chr(64 + $loop->iteration) }}</span>
           <h3>{{ $ta->treino->nome ?? '—' }}</h3>
-          <p>
-            {{ $ta->validade ? 'Válido até '.$ta->validade->format('d/m/Y') : 'Sem data de validade' }}
-          </p>
+          <p>{{ $ta->validade ? 'Válido até '.$ta->validade->format('d/m/Y') : 'Sem data de validade' }}</p>
           @if($ta->treino->descricao ?? false)
             <div class="obs"><i class="ti ti-alert-circle" style="font-size:14px"></i> {{ $ta->treino->descricao }}</div>
           @endif
@@ -415,7 +349,6 @@
         <div class="empty-row" style="padding:2rem;text-align:center;color:var(--muted)">Nenhuma ficha de treino atribuída.</div>
       </div>
       @endforelse
->>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
     </section>
 
     <!-- AULAS -->
