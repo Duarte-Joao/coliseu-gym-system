@@ -6,7 +6,7 @@
 </x-page-header>
 
 <div class="form-card">
-  <form method="POST" action="{{ route('treinos.update', $treino) }}">
+  <form method="POST" action="{{ route('treinos.update', $treino) }}" enctype="multipart/form-data">
     @csrf @method('PUT')
     <div class="form-grid">
       <div class="fg">
@@ -51,9 +51,10 @@
 @push('scripts')
 <script>
 let idx = 0;
+const storageUrl = "{{ asset('storage') }}";
 const existentes = @json($treino->exercicios ?? []);
 
-function addExercicio(nome='', series=3, reps=10, carga=0) {
+function addExercicio(nome='', series=3, reps=10, carga=0, imagemPath='') {
   const row = document.createElement('div');
   row.className = 'ex-row';
   row.innerHTML = `
@@ -65,12 +66,15 @@ function addExercicio(nome='', series=3, reps=10, carga=0) {
       <input type="number" name="exercicios[${idx}][repeticoes]" min="1" value="${reps}" required></div>
     <div class="fg"><label>Carga (kg)</label>
       <input type="number" name="exercicios[${idx}][carga]" min="0" step="0.5" value="${carga}" required></div>
+    <div class="fg span2"><label>Imagem do exercício</label>
+      <input type="file" name="exercicios[${idx}][imagem]" accept="image/*"></div>
+    ${imagemPath ? `<div class="fg span2"><small>Imagem atual: <a href="${storageUrl}/${imagemPath}" target="_blank">ver</a></small><input type="hidden" name="exercicios[${idx}][imagem_antiga]" value="${imagemPath}"></div>` : ''}
     <button type="button" class="ex-remove" onclick="this.parentElement.remove()"><i class="ti ti-x"></i></button>`;
   document.getElementById('ex-list').appendChild(row);
   idx++;
 }
 
-existentes.forEach(e => addExercicio(e.nome, e.series, e.repeticoes, e.carga));
+existentes.forEach(e => addExercicio(e.nome, e.series, e.repeticoes, e.carga, e.imagem ?? ''));
 if (existentes.length === 0) addExercicio();
 </script>
 @endpush

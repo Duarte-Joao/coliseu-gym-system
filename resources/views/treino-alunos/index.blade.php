@@ -20,11 +20,15 @@
     <div class="empty"><i class="ti ti-clipboard-list"></i>Nenhuma atribuição encontrada</div>
   @else
   <table>
+<<<<<<< HEAD
+    <thead><tr><th>Aluno</th><th>Treino</th><th>Instrutor</th><th>Início</th><th>Fim</th><th>PDF</th><th>Ações</th></tr></thead>
+=======
     <thead><tr>
       <th>Aluno</th><th>Treino</th>
       @if(!isset($meuInstrutor) || !$meuInstrutor)<th>Instrutor</th>@endif
       <th>Validade</th><th></th>
     </tr></thead>
+>>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
     <tbody>
     @foreach($atribuicoes as $a)
     <tr>
@@ -34,6 +38,9 @@
         <td>{{ $a->treino->instrutor->usuario->name ?? '—' }}</td>
       @endif
       <td>{{ $a->validade?->format('d/m/Y') ?? '—' }}</td>
+      <td>
+        <a href="{{ route('treino-alunos.pdf', $a) }}" class="btn primary btn-sm" target="_blank">PDF</a>
+      </td>
       <td>
         <div class="actions">
           <a href="{{ route('treino-alunos.edit', $a) }}" class="btn ghost btn-sm"><i class="ti ti-pencil"></i></a>

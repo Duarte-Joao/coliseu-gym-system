@@ -446,9 +446,30 @@
       <form id="form-login" action="{{ route('login.post') }}" method="POST">
         @csrf
 
+<<<<<<< HEAD
+        <input type="hidden" name="tipo"             id="tipo_usuario"     value="aluno">
+        <input type="hidden" name="status"                                  value="ativo">
+        <input type="hidden" name="acao_formulario"   id="acao_formulario"  value="login">
+
+        {{-- MENSAGENS DE ERRO --}}
+        @if ($errors->any())
+        <div style="background: rgba(239,68,68,0.1); border: 1px solid rgba(239,68,68,0.3); border-radius: 8px; padding: 1rem; margin-bottom: 1.5rem; color: #f87171;">
+            <strong>Erro:</strong>
+            <ul style="margin-top: 0.5rem; padding-left: 1.5rem;">
+                @foreach ($errors->all() as $error)
+                <li style="margin: 0.25rem 0;">{{ $error }}</li>
+                @endforeach
+            </ul>
+        </div>
+        @endif
+
+        <!-- ── PARTE DO LOGIN ── -->
+        <div id="bloco-login" class="form-block visible">
+=======
         @if($errors->has('email') && !$showCadastro)
           <div class="alert alert-error">{{ $errors->first('email') }}</div>
         @endif
+>>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
 
         <div style="display:flex; flex-direction:column; gap:1.1rem;">
           <div class="fg">
@@ -701,12 +722,76 @@
     }
   }
 
+<<<<<<< HEAD
+    // some com  todos os blocos do formulário
+    function ocultarTodos() {
+      ['bloco-login', 'cadastro-passo-1', 'cadastro-passo-2']
+        .forEach(id => document.getElementById(id).classList.remove('visible'));
+    }
+
+    // vai e volta entre os passos do cadastro
+    function avancarPasso(passo) {
+      ocultarTodos();
+      document.getElementById(passo === 2 ? 'cadastro-passo-2' : 'cadastro-passo-1')
+              .classList.add('visible');
+    }
+
+    function setFormMode(acao) {
+      const loginInputs = document.querySelectorAll('#bloco-login input');
+      const cadastroInputs = document.querySelectorAll('#cadastro-passo-1 input, #cadastro-passo-2 input');
+      const isLoginMode = acao === 'login';
+
+      loginInputs.forEach(input => {
+        if (input.type !== 'hidden') {
+          input.disabled = !isLoginMode;
+        }
+      });
+
+      cadastroInputs.forEach(input => {
+        if (input.type !== 'hidden') {
+          input.disabled = isLoginMode;
+        }
+      });
+    }
+
+    // muda entre os do  perfil Aluno e Instrutor
+    function mudarPerfil(perfil) {
+      limparFormulario();
+      document.querySelectorAll('.tab-btn')
+              .forEach((btn, i) => btn.classList.toggle('active', (perfil === 'aluno' ? i === 0 : i === 1)));
+      document.getElementById('tipo_usuario').value = perfil;
+
+      const subTabs = document.getElementById('aluno-sub-tabs');
+
+      if (perfil === 'aluno') {
+        subTabs.style.display = 'flex';
+        mudarAcao('login');
+      } else {
+        subTabs.style.display = 'none';
+        ocultarTodos();
+
+        document.getElementById('form-eyebrow').textContent  = 'Acesso Instrutor';
+        document.getElementById('form-title').textContent    = 'Painel do Mestre';
+        document.getElementById('form-desc').textContent     = 'Entre para gerenciar seus alunos e treinos.';
+
+        document.getElementById('acao_formulario').value = 'login';
+        document.getElementById('auth-form').action     = "{{ route('login.post') }}";
+
+        // coloca de novo o tal do  required para o bloco de login do instrutor
+        document.getElementById('input-email').required  = true;
+        document.getElementById('password').required     = true;
+        setFormMode('login');
+
+        document.getElementById('bloco-login').classList.add('visible');
+        document.getElementById('btn-submit').textContent = 'Acessar Painel';
+=======
   function mask(input, pattern) {
     input.addEventListener('input', function () {
       const digits = this.value.replace(/\D/g, '');
       let result = '', di = 0;
       for (let pi = 0; pi < pattern.length && di < digits.length; pi++) {
         result += pattern[pi] === '0' ? digits[di++] : pattern[pi];
+>>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
       }
       this.value = result;
     });
@@ -723,6 +808,51 @@
       mudarAcao('cadastro');
       if (cadastroStep === 2) avancarPasso(2);
     }
+<<<<<<< HEAD
+
+    // Muda o negocio de Entrar e Criar Conta (somente para alunos)
+    function mudarAcao(acao) {
+      limparFormulario();
+      document.querySelectorAll('.sub-tab-btn')
+              .forEach((btn, i) => btn.classList.toggle('active', (acao === 'login' ? i === 0 : i === 1)));
+      document.getElementById('acao_formulario').value = acao;
+
+      if (acao === 'login') {
+        document.getElementById('form-eyebrow').textContent = 'Acesso Aluno';
+        document.getElementById('form-title').textContent   = 'Acesse a Arena';
+        document.getElementById('form-desc').textContent    = 'Entre para gerenciar seus treinos e planos.';
+        document.getElementById('auth-form').action         = "{{ route('login.post') }}";
+
+        document.getElementById('input-email').required = true;
+        document.getElementById('password').required    = true;
+        setFormMode('login');
+
+        ocultarTodos();
+        document.getElementById('bloco-login').classList.add('visible');
+
+      } else {
+        document.getElementById('form-eyebrow').textContent = 'Nova Matrícula';
+        document.getElementById('form-title').textContent   = 'Crie sua Conta';
+        document.getElementById('form-desc').textContent    = 'Cadastre-se para iniciar a sua jornada.';
+        document.getElementById('auth-form').action         = "{{ route('register.post') }}";
+
+        // Desativa required dos campos de login para não bloquear o submit do cadastro
+        document.getElementById('input-email').required = false;
+        document.getElementById('password').required    = false;
+        setFormMode('cadastro');
+
+        ocultarTodos();
+        document.getElementById('cadastro-passo-1').classList.add('visible');
+      }
+    }
+
+    // inicializa o formulário no modo login, com campos de cadastro desabilitados
+    setFormMode('login');
+  </script>
+</body>
+</html>
+=======
   });
 </script>
 @endpush
+>>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591

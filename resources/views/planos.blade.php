@@ -10,6 +10,18 @@
         </p>
 
         <div class="plans-grid" style="grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 2rem;">
+<<<<<<< HEAD
+            
+            @foreach($planosDisponiveis as $plano)
+            <div class="plan-card @if($plano->featured) featured @endif">
+                @if($plano->featured)
+                <div class="plan-badge">Melhor Custo-Benefício</div>
+                @endif
+                <div class="plan-name">{{ $plano->tipo }}</div>
+                <div class="plan-price">R$ {{ number_format($plano->valor, 0, '', '') }}<span>,{{ sprintf('%02d', ($plano->valor * 100) % 100) }}</span></div>
+                <p style="font-size: 0.85rem; color: @if($plano->featured) rgba(255,255,255,0.8) @else var(--gold) @endif; margin-top: 0.3rem;">{{ $plano->descricao }}</p>
+                
+=======
 
             <div class="plan-card">
                 <div class="plan-name">Mensal</div>
@@ -44,15 +56,16 @@
                 <div class="plan-name">Semestral</div>
                 <div class="plan-price">R$ 539<span>,90</span></div>
                 <p style="font-size: 0.85rem; color: rgba(255,255,255,0.8); margin-top: 0.3rem;">Equivale a R$ 89,98/mês</p>
+>>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
                 <div class="plan-divider"></div>
                 <ul class="plan-features" style="text-align: left; font-size: 0.95rem;">
-                    <li>Acesso a todas as áreas (Geral)</li>
-                    <li>Válido por 6 meses corridos</li>
-                    <li>2 avaliações físicas completas</li>
-                    <li>Suporte com instrutor de elite</li>
-                    <li>Brinde: Coqueteleira Coliseu</li>
+                    @foreach($plano->beneficios as $beneficio)
+                    <li>{{ $beneficio }}</li>
+                    @endforeach
                 </ul>
                 <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
+<<<<<<< HEAD
+=======
             </div>
 
             <div class="plan-card">
@@ -68,7 +81,9 @@
                     <li>Maior desconto da casa</li>
                 </ul>
                 <a href="{{ route('login') }}" class="plan-btn" style="margin-top: 2rem;">Matricular-se</a>
+>>>>>>> cf6be7573f1fe6556d70cd887e9c0aedbfa13591
             </div>
+            @endforeach
 
         </div>
     </main>
